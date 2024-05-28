@@ -412,7 +412,7 @@ model = dict(
         group_id_list=group_id_list,
         num_anchor=6,
         use_nonlinear_optimizer=use_nonlinear_optimizer,
-        anchor_info_path='/home/hyun/local_storage/code/UniAD/data/others/motion_anchor_infos_mode6.pkl', ##'data/others/motion_anchor_infos_mode6.pkl',
+        anchor_info_path='/home/hyun/local_storage/code/UniAD/data/others/motion_anchor_infos_mode6.pkl', #_'data/others/motion_anchor_infos_mode6.pkl',
         transformerlayers=dict(
             type='MotionTransformerDecoder',
             pc_range=point_cloud_range,
@@ -469,8 +469,8 @@ model = dict(
     ),
 )
 dataset_type = "NuScenesE2EDataset"
-data_root = "/home/hyun/local_storage/code/UniAD/data/nuscenes/" ##"data/nuscenes/"
-info_root = "/home/hyun/local_storage/code/UniAD/data/infos/" ##"data/infos/"
+data_root = "/home/hyun/local_storage/code/UniAD/data/nuscenes/" #_ "data/nuscenes/"
+info_root = "/home/hyun/local_storage/code/UniAD/data/infos/" #_ "data/infos/"
 file_client_args = dict(backend="disk")
 ann_file_train=info_root + f"nuscenes_infos_temporal_train.pkl"
 ann_file_val=info_root + f"nuscenes_infos_temporal_val.pkl"

@@ -151,6 +151,9 @@ debug/
 
 core.*
 
+
+
+#github 업로드 안할파일 목록
 work_dirs/
 .vscode/
 ..memo/

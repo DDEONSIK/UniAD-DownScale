@@ -7,7 +7,7 @@ class_names = [
     'motorcycle', 'pedestrian', 'traffic_cone', 'barrier'
 ]
 dataset_type = 'NuScenesDataset'
-data_root = '/home/hyun/local_storage/code/UniAD/data/nuscenes/' ##'data/nuscenes/'
+data_root = '/home/hyun/local_storage/code/UniAD/data/nuscenes/' #_'data/nuscenes/'
 # Input modality for nuScenes dataset, this is consistent with the submission
 # format which requires the information in input_modality.
 input_modality = dict(
