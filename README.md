@@ -1,3 +1,21 @@
+#현식 업데이트
+
+#추가
+UniAD/ckpts #체크포인트
+UniAD/data #데이터
+UniAD/projects/work_dirs #학습로그 (자동생성)
+
+
+
+
+
+
+
+
+
+
+
+
 <div align="center">   
   
 # Planning-oriented Autonomous Driving
