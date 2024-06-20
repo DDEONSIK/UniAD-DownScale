@@ -20,6 +20,8 @@ from mmdet3d.core.bbox.coders import build_bbox_coder
 from projects.mmdet3d_plugin.core.bbox.util import normalize_bbox
 from mmcv.runner import force_fp32, auto_fp16
 
+import matplotlib.pyplot as plt
+
 
 @HEADS.register_module()
 class BEVFormerTrackHead(DETRHead):
@@ -80,7 +82,7 @@ class BEVFormerTrackHead(DETRHead):
         self.code_weights = nn.Parameter(torch.tensor(
             self.code_weights, requires_grad=False), requires_grad=False)
 
-    def _init_layers(self): # 분류, 회귀, 궤적 예측 브랜치 초기화
+    def _init_layers(self): # 분류, 회귀, 궤적 예측 브랜치 레이어 초기화
         """Initialize classification branch and regression branch of head."""
         cls_branch = []
         for _ in range(self.num_reg_fcs):
@@ -130,20 +132,23 @@ class BEVFormerTrackHead(DETRHead):
             self.bev_embedding = nn.Embedding(
                 self.bev_h * self.bev_w, self.embed_dims)
 
-    def init_weights(self): # DeformDETR 가중치 초기화 # Loss에 사용할 바이어스 초기화
+    def init_weights(self): # DeformDETR transformer 가중치 초기화 # Loss에 사용할 바이어스 초기화
         """Initialize weights of the DeformDETR head."""
         self.transformer.init_weights()
         if self.loss_cls.use_sigmoid:
             bias_init = bias_init_with_prob(0.01)
             for m in self.cls_branches:
                 nn.init.constant_(m[-1].bias, bias_init)
-    
+
+
+
+    #TrackFormer에 들어가는 값 (Input):
     def get_bev_features(self, mlvl_feats, img_metas, prev_bev=None): ###### multi level Feature로부터 BEV Features 추출
         bs, num_cam, _, _, _ = mlvl_feats[0].shape
-        dtype = mlvl_feats[0].dtype #리스트의 첫 번째 데이터 타입을 가져옴
-        bev_queries = self.bev_embedding.weight.to(dtype) #bs:1, bev_h,w:200, embed_dims:128, 
+        dtype = mlvl_feats[0].dtype # 리스트의 첫 번째 데이터 타입을 가져옴
+        bev_queries = self.bev_embedding.weight.to(dtype) # bs:1, bev_h,w:200, embed_dims:128, 
 
-        bev_mask = torch.zeros((bs, self.bev_h, self.bev_w),
+        bev_mask = torch.zeros((bs, self.bev_h, self.bev_w), 
                                device=bev_queries.device).to(dtype)
         bev_pos = self.positional_encoding(bev_mask).to(dtype)
         bev_embed = self.transformer.get_bev_features(
@@ -151,14 +156,24 @@ class BEVFormerTrackHead(DETRHead):
             bev_queries,
             self.bev_h,
             self.bev_w,
-            grid_length=(self.real_h / self.bev_h,
+            grid_length=(self.real_h / self.bev_h, 
                          self.real_w / self.bev_w),
             bev_pos=bev_pos,
             prev_bev=prev_bev,
             img_metas=img_metas,
         )
+
+        # BEV Features 시각화
+        plt.figure()
+        plt.title("BEV Features")
+        plt.imshow(bev_embed[0].cpu().detach().numpy())  # BEV Features 데이터를 이미지 형태로 시각화
+        plt.savefig('UniAD/projects/mmdet3d_plugin/uniad/dense_heads/bev_features.png')
+        plt.close()
+
         return bev_embed, bev_pos
 
+
+    #TrackFormer에서 계산되는 과정 (Processing):
     def get_detections( ####### BEV Feature와 Object Query를 기반으로 객체 검출
         self, 
         bev_embed,
@@ -232,9 +247,22 @@ class BEVFormerTrackHead(DETRHead):
             'last_ref_points': last_ref_points,
             'query_feats': hs,
         }
+
+        # Detections 시각화
+        plt.figure()
+        plt.title("Detections") 
+        for det in outputs_coords:  # 각 객체 검출 결과를 반복
+            for bbox in det:  # 각 객체의 경계 상자 좌표 추출
+                plt.plot(bbox[0].cpu().detach().numpy(), bbox[1].cpu().detach().numpy(), 'ro')  # 경계 상자 좌표를 빨간 점으로 시각화
+        plt.savefig('UniAD/projects/mmdet3d_plugin/uniad/dense_heads/detections.png')
+        plt.close()
+
         return outs
-        
-    def _get_target_single(self,
+
+
+
+
+    def _get_target_single(self, # 한 이미지에 대한 회귀 및 분류 타겟 계산
                            cls_score,
                            bbox_pred,
                            gt_labels,
@@ -293,7 +321,7 @@ class BEVFormerTrackHead(DETRHead):
         return (labels, label_weights, bbox_targets, bbox_weights,
                 pos_inds, neg_inds)
 
-    def get_targets(self,
+    def get_targets(self, # 예측된 값과 실제 값 비교를 위한 타겟 설정
                     cls_scores_list,
                     bbox_preds_list,
                     gt_bboxes_list,
@@ -344,7 +372,7 @@ class BEVFormerTrackHead(DETRHead):
         return (labels_list, label_weights_list, bbox_targets_list,
                 bbox_weights_list, num_total_pos, num_total_neg)
 
-    def loss_single(self,
+    def loss_single(self, # 단일 디코더 레이어 출력으로 Loss 계산
                     cls_scores,
                     bbox_preds,
                     gt_bboxes_list,
@@ -414,7 +442,7 @@ class BEVFormerTrackHead(DETRHead):
         return loss_cls, loss_bbox
 
     @force_fp32(apply_to=('preds_dicts'))
-    def loss(self,
+    def loss(self, # 전체 Loss 계산
              gt_bboxes_list,
              gt_labels_list,
              preds_dicts,
@@ -500,8 +528,10 @@ class BEVFormerTrackHead(DETRHead):
             num_dec_layer += 1
         return loss_dict
 
+
+    #TrackFormer에서 도출되는 값 (Output):
     @force_fp32(apply_to=('preds_dicts'))
-    def get_bboxes(self, preds_dicts, img_metas, rescale=False):
+    def get_bboxes(self, preds_dicts, img_metas, rescale=False): # Bounding Box 생성
         """Generate bboxes from bbox head predictions.
         Args:
             preds_dicts (tuple[list[dict]]): Prediction results.
