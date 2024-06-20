@@ -34,7 +34,7 @@ class BEVFormerTrackHead(DETRHead):
         bev_h, bev_w (int): spatial shape of BEV queries.
     """
 
-    def __init__(self,
+    def __init__(self, # 필요한 매개변수와 변수 설정 # 부모 클래스 DETRHead 초기화
                  *args,
                  with_box_refine=False,
                  as_two_stage=False,
@@ -80,7 +80,7 @@ class BEVFormerTrackHead(DETRHead):
         self.code_weights = nn.Parameter(torch.tensor(
             self.code_weights, requires_grad=False), requires_grad=False)
 
-    def _init_layers(self):
+    def _init_layers(self): # 분류, 회귀, 궤적 예측 브랜치 초기화
         """Initialize classification branch and regression branch of head."""
         cls_branch = []
         for _ in range(self.num_reg_fcs):
@@ -130,7 +130,7 @@ class BEVFormerTrackHead(DETRHead):
             self.bev_embedding = nn.Embedding(
                 self.bev_h * self.bev_w, self.embed_dims)
 
-    def init_weights(self):
+    def init_weights(self): # DeformDETR 가중치 초기화 # Loss에 사용할 바이어스 초기화
         """Initialize weights of the DeformDETR head."""
         self.transformer.init_weights()
         if self.loss_cls.use_sigmoid:
@@ -138,10 +138,10 @@ class BEVFormerTrackHead(DETRHead):
             for m in self.cls_branches:
                 nn.init.constant_(m[-1].bias, bias_init)
     
-    def get_bev_features(self, mlvl_feats, img_metas, prev_bev=None):
+    def get_bev_features(self, mlvl_feats, img_metas, prev_bev=None): ###### multi level Feature로부터 BEV Features 추출
         bs, num_cam, _, _, _ = mlvl_feats[0].shape
-        dtype = mlvl_feats[0].dtype
-        bev_queries = self.bev_embedding.weight.to(dtype)
+        dtype = mlvl_feats[0].dtype #리스트의 첫 번째 데이터 타입을 가져옴
+        bev_queries = self.bev_embedding.weight.to(dtype) #bs:1, bev_h,w:200, embed_dims:128, 
 
         bev_mask = torch.zeros((bs, self.bev_h, self.bev_w),
                                device=bev_queries.device).to(dtype)
@@ -159,7 +159,7 @@ class BEVFormerTrackHead(DETRHead):
         )
         return bev_embed, bev_pos
 
-    def get_detections(
+    def get_detections( ####### BEV Feature와 Object Query를 기반으로 객체 검출
         self, 
         bev_embed,
         object_query_embeds=None,
@@ -191,7 +191,7 @@ class BEVFormerTrackHead(DETRHead):
             reference = inverse_sigmoid(reference)
             outputs_class = self.cls_branches[lvl](hs[lvl])
             tmp = self.reg_branches[lvl](hs[lvl])  # xydxdyxdz
-            outputs_past_traj = self.past_traj_reg_branches[lvl](hs[lvl]).view(
+            outputs_past_traj = self.past_traj_reg_branches[lvl](hs[lvl]).view( #궤적 예측
                 tmp.shape[0], -1, self.past_steps + self.fut_steps, 2)
             # TODO: check the shape of reference
             assert reference.shape[-1] == 3
@@ -200,7 +200,7 @@ class BEVFormerTrackHead(DETRHead):
             tmp[..., 4:5] += reference[..., 2:3]
             tmp[..., 4:5] = tmp[..., 4:5].sigmoid()
 
-            last_ref_points = torch.cat(
+            last_ref_points = torch.cat( #추적 과정에서 객체의 현재 위치와 이동 방향을 파악하는 데 사용
                 [tmp[..., 0:2], tmp[..., 4:5]], dim=-1,
             )
 

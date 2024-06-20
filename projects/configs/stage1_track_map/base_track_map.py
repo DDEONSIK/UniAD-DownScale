@@ -115,14 +115,14 @@ model = dict(
     score_thresh=0.4,
     filter_score_thresh=0.35,
     qim_args=dict(
-        qim_type="QIMBase",
+        qim_type="QIMBase", #Track #MOTR
         merger_dropout=0,
         update_query_pos=True,
         fp_ratio=0.3,
         random_drop=0.1,
     ),  # hyper-param for query dropping mentioned in MOTR
     mem_args=dict(
-        memory_bank_type="MemoryBank",
+        memory_bank_type="MemoryBank", #Track #MOTR #QIM #TAN
         memory_bank_score_thresh=0.0,
         memory_bank_len=4,
     ),

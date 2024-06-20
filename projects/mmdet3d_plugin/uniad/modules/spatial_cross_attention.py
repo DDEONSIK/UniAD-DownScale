@@ -5,6 +5,17 @@
 #  Modified by Zhiqi Li
 # ---------------------------------------------
 
+import os
+# import sys #디버깅
+# sys.path.append('/home/hyun/local_storage/code/UniAD') #디버깅
+
+#시각화
+import matplotlib
+import matplotlib.pyplot as plt
+import numpy as np
+import seaborn as sns
+
+
 from mmcv.ops.multi_scale_deform_attn import multi_scale_deformable_attn_pytorch
 import warnings
 import torch
@@ -23,12 +34,15 @@ from mmcv.runner.base_module import BaseModule, ModuleList, Sequential
 from mmcv.utils import ext_loader
 from .multi_scale_deformable_attn_function import MultiScaleDeformableAttnFunction_fp32, \
     MultiScaleDeformableAttnFunction_fp16
+    
+#디버깅
+# from projects.mmdet3d_plugin.uniad.modules.multi_scale_deformable_attn_function import MultiScaleDeformableAttnFunction_fp32, MultiScaleDeformableAttnFunction_fp16
+
 ext_module = ext_loader.load_ext(
     '_ext', ['ms_deform_attn_backward', 'ms_deform_attn_forward'])
 
-
-@ATTENTION.register_module()
-class SpatialCrossAttention(BaseModule):
+@ATTENTION.register_module() #아래 SpatialCrossAttention 클래스를 ATTENTION 레지스트리에 등록
+class SpatialCrossAttention(BaseModule): #BaseModule: 상속받을 부모 클래스. BaseModule기능 사용.
     """An attention module used in BEVFormer.
     Args:
         embed_dims (int): The embedding dimension of Attention.
@@ -70,7 +84,7 @@ class SpatialCrossAttention(BaseModule):
     def init_weight(self):
         """Default initialization for Parameters of Module."""
         xavier_init(self.output_proj, distribution='uniform', bias=0.)
-    
+   
     @force_fp32(apply_to=('query', 'key', 'value', 'query_pos', 'reference_points_cam'))
     def forward(self,
                 query,
@@ -130,19 +144,21 @@ class SpatialCrossAttention(BaseModule):
         if query_pos is not None:
             query = query + query_pos
 
-        bs, num_query, _ = query.size()
+        bs, num_query, _ = query.size() #embed_dims: 128
+        print(f"bs: {bs}, num_query: {num_query}") #디버깅
 
         D = reference_points_cam.size(3)
         indexes = []
         for i, mask_per_img in enumerate(bev_mask):
             index_query_per_img = mask_per_img[0].sum(-1).nonzero().squeeze(-1)
             indexes.append(index_query_per_img)
-        max_len = max([len(each) for each in indexes])
+        max_len = max([len(each) for each in indexes]) #Tensor.__len__:6313~9@@@ #bev_mask: False #
 
         # each camera only interacts with its corresponding BEV queries. This step can  greatly save GPU memory.
+        # 각 카메라는 해당 BEV 쿼리와만 상호 작용합니다. 이 단계를 통해 GPU 메모리를 크게 절약할 수 있습니다.
         queries_rebatch = query.new_zeros(
             [bs, self.num_cams, max_len, self.embed_dims])
-        reference_points_rebatch = reference_points_cam.new_zeros(
+        reference_points_rebatch = reference_points_cam.new_zeros( #reference_points_cam
             [bs, self.num_cams, max_len, D, 2])
         
         for j in range(bs):
@@ -155,10 +171,12 @@ class SpatialCrossAttention(BaseModule):
 
         key = key.permute(2, 0, 1, 3).reshape(
             bs * self.num_cams, l, self.embed_dims)
+        print(f"key: {key}") #디버깅
         value = value.permute(2, 0, 1, 3).reshape(
             bs * self.num_cams, l, self.embed_dims)
+        print(f"value: {value}") #디버깅
 
-        queries = self.deformable_attention(query=queries_rebatch.view(bs*self.num_cams, max_len, self.embed_dims), key=key, value=value, #queries 값 보면 2?3?D가 아님
+        queries = self.deformable_attention(query=queries_rebatch.view(bs*self.num_cams, max_len, self.embed_dims), key=key, value=value, #queries 값 보면 2?3?D가 아님 # num_cams 6
                                             reference_points=reference_points_rebatch.view(bs*self.num_cams, max_len, D, 2), spatial_shapes=spatial_shapes,
                                             level_start_index=level_start_index).view(bs, self.num_cams, max_len, self.embed_dims)
         for j in range(bs):
@@ -169,9 +187,108 @@ class SpatialCrossAttention(BaseModule):
         count = count.permute(1, 2, 0).sum(-1)
         count = torch.clamp(count, min=1.0)
         slots = slots / count[..., None]
-        slots = self.output_proj(slots) #2D로 변환
+        slots = self.output_proj(slots) #2D로 변환 #_ 차원 섞여 있어서 하나로 맞춰줘야함
+        print(f"slots: {slots}") #디버깅
+
+        # 시각화 함수
+        def visualize_tensor(tensor, title, filename):
+            tensor_np = tensor.detach().cpu().numpy() # 텐서를 넘파이 배열로 변환
+            mean_tensor = np.mean(tensor_np, axis=0) # 텐서의 첫 번째 축을 기준으로 평균 계산
+            plt.figure(figsize=(10, 8)) # 그래프 크기
+            sns.heatmap(mean_tensor, cmap="viridis", annot=False) # 히트맵
+            plt.title(title) # 그래프 제목 
+            plt.xlabel('Features') # x축 레이블 # 특성
+            plt.ylabel('Tokens') # y축 레이블 # 토큰
+            plt.savefig(f'/home/hyun/local_storage/code/UniAD/projects/mmdet3d_plugin/uniad/modules/{filename}') # 그래프를 파일로 저장
+            plt.close()
+
+        # 개별 텐서 시각화
+        visualize_tensor(query, 'SCA Query Tensor', 'SCA_tensor_query.png')        # query 텐서 시각화
+        visualize_tensor(key, 'SCA Key Tensor', 'SCA_tensor_key.png')              # key 텐서 시각화
+        visualize_tensor(value, 'SCA Value Tensor', 'SCA_tensor_value.png')        # value 텐서 시각화
+        visualize_tensor(slots, 'SCA Slots Tensor', 'SCA_tensor_slots.png')        # slots 텐서 시각화 
+
+        queries_2d_1 = queries.mean(dim=1)  # queries 텐서의 처음 차원에 대한 평균을 계산, 2차원 텐서로 변환 
+        visualize_tensor(queries_2d_1, 'SCA Queries Tensor 1', 'SCA_tensor_queries_1.png')  # queries_1 텐서 시각화
+
+        queries_2d__1 = queries.mean(dim=-1)  # queries 텐서의 마지막 차원에 대한 평균을 계산, 2차원 텐서로 변환
+        visualize_tensor(queries_2d__1, 'SCA Queries Tensor -1', 'SCA_tensor_queries_-1.png')  # queries_-1 텐서 시각화
+
+        queries_2d__2 = queries.mean(dim=2)  # queries 텐서의 중간 차원에 대한 평균을 계산, 2차원 텐서로 변환
+        visualize_tensor(queries_2d__2, 'SCA Queries Tensor 2', 'SCA_tensor_queries_2.png')  # queries_-1 텐서 시각화
+
 
         return self.dropout(slots) + inp_residual
+
+
+
+    # ###########################################
+    # ###########################################
+    # ###########################################
+
+
+    # def get_attention_maps(self, x, mask=None): # 각 인코더 블록에서 attention map을 추출하는 메서드.
+    #     attention_maps = [] # attention map을 저장하기 위한 목록을 초기화
+    #     for layer in self.layers: # 각 인코더 블록을 반복
+    #         _, attn_map = layer.self_attn(x, mask=mask, return_attention=True) # 인코더 블록에서 attention map을 추출
+    #         attention_maps.append(attn_map) # attention map을 목록에 추가
+    #         x = layer(x) # 입력을 인코더 블록을 통해 전달
+    #     return attention_maps
+
+    # def plot_attention_maps(input_data, attn_maps, idx=0): # 주어진 input_data가 None이 아니면, idx에 해당하는 데이터를 numpy 배열로 변환
+    #     if input_data is not None: # input_data가 None인 경우 attn_maps의 길이를 기준으로 숫자 배열을 생성
+    #         input_data = input_data[idx].detach().cpu().numpy()
+    #     else:
+    #         input_data = np.arange(attn_maps[0][idx].shape[-1])
+    #     attn_maps = [m[idx].detach().cpu().numpy() for m in attn_maps] # 모든 attention map들을 CPU 메모리로 이동시키고 numpy 배열로 변환
+
+    #     num_heads = attn_maps[0].shape[0] # 첫 번째 attention map의 형태로부터 head의 수를 알아냄
+    #     num_layers = len(attn_maps) # attn_maps의 길이를 통해 레이어의 수를 알아냄
+    #     seq_len = input_data.shape[0] # input_data의 길이를 통해 시퀀스의 길이를 알아냄
+    #     fig_size = 4 if num_heads == 1 else 3 # head의 수에 따라 그림의 크기를 설정
+    #     fig, ax = plt.subplots(num_layers, num_heads, figsize=(num_heads * fig_size, num_layers * fig_size)) # num_layers와 num_heads를 사용하여 subplots를 생성
+    #     if num_layers == 1: # num_layers가 1이면, ax를 리스트 형태로 변경
+    #         ax = [ax]
+    #     if num_heads == 1: # num_heads가 1이면, ax를 2차원 리스트 형태로 변경
+    #         ax = [[a] for a in ax]
+    #     for row in range(num_layers): # 각 레이어와 head마다 attention map을 그림
+    #         for column in range(num_heads):
+    #             ax[row][column].imshow(attn_maps[row][column], origin="lower", vmin=0)
+    #             ax[row][column].set_xticks(list(range(seq_len)))
+    #             ax[row][column].set_xticklabels(input_data.tolist())
+    #             ax[row][column].set_yticks(list(range(seq_len)))
+    #             ax[row][column].set_yticklabels(input_data.tolist())
+    #             ax[row][column].set_title("Layer %i, Head %i" % (row + 1, column + 1))
+    #     fig.subplots_adjust(hspace=0.5) # subplot 간의 간격을 조정
+    #     #plt.savefig('savefig_4.png') #plt.show()
+    #     index = max([int(f.split('-')[-1].split('.')[0]) for f in os.listdir('/home/hyun/local_storage/code/..memo') if f.startswith('savefig_attention_maps-')] or [0]) + 1
+    #     plt.savefig(f'/home/hyun/local_storage/code/..memo/savefig_attention_maps-{index}.png')
+    #     plt.close()
+
+    # plot_attention_maps(data_input, attention_maps, idx=0) # `plot_attention_maps` 함수를 호출하여 주어진 입력 데이터와 attention map을 시각화
+
+    # DATA_MEANS = np.array([0.485, 0.456, 0.406])
+    # DATA_STD = np.array([0.229, 0.224, 0.225])
+
+    # TORCH_DATA_MEANS = torch.from_numpy(DATA_MEANS).view(1, 3, 1, 1)
+    # TORCH_DATA_STD = torch.from_numpy(DATA_STD).view(1, 3, 1, 1)
+
+    # SET_SIZE = 10 # 집합의 크기를 10으로 설정함
+
+    # # `anomaly_model`의 내부 attention 맵(어텐션 가중치)을 가져옴. 이 가중치들은 입력 데이터의 각 부분에 얼마나 주의를 기울이는지 나타냄
+    # attention_maps = anomaly_model.get_attention_maps(inp_data, add_positional_encoding=False)
+    # # 예측 결과 중 가장 높은 확률값을 가진 클래스의 인덱스를 반환하여 최종 예측값을 구함.
+    # predictions = preds.argmax(dim=-1)
+
+    # def visualize_prediction(idx): # 주어진 인덱스의 이미지와 해당 이미지에 대한 어텐션 맵을 시각화하는 함수를 정의
+    #     print("Prediction:", predictions[idx].item()) # 해당 이미지에 대한 모델의 예측값을 출력
+    #     plot_attention_maps(input_data=None, attn_maps=attention_maps, idx=idx) # idx번째 이미지에 대한 어텐션 맵을 시각화. `plot_attention_maps` 함수는 여기 제공되지 않았지만, 입력 데이터와 어텐션 맵을 받아 시각화를 수행한다고 추정
+
+
+
+    # ###########################################
+    # ###########################################
+    # ###########################################
 
 
 @ATTENTION.register_module()
@@ -352,6 +469,11 @@ class MSDeformableAttention3D(BaseModule):
             After proejcting, each BEV query has `num_Z_anchors` reference points in each 2D image.
             For each referent point, we sample `num_points` sampling points.
             For `num_Z_anchors` reference points,  it has overall `num_points * num_Z_anchors` sampling points.
+
+            각 BEV 쿼리마다 높이가 다른 3D 공간에 `num_Z_anchors`를 소유합니다.
+            투영 후, 각 BEV 쿼리는 각 2D 이미지에 `num_Z_anchors` 기준점을 갖습니다.
+            각 기준점에 대해 `num_points` 샘플링 포인트를 샘플링합니다.
+            num_Z_anchors` 기준점의 경우, 전체 `num_points * num_Z_anchors` 샘플링 포인트가 있습니다.            
             """
             offset_normalizer = torch.stack(
                 [spatial_shapes[..., 1], spatial_shapes[..., 0]], -1)
@@ -377,7 +499,7 @@ class MSDeformableAttention3D(BaseModule):
                 f'Last dim of reference_points must be'
                 f' 2 or 4, but get {reference_points.shape[-1]} instead.')
 
-        #  sampling_locations.shape: bs, num_query, num_heads, num_levels, num_all_points, 2
+        #  sampling_locations.shape: bs, num_query, num_heads, num_levels, num_all_points, 2  #_ Deformable
         #  attention_weights.shape: bs, num_query, num_heads, num_levels, num_all_points
         #
 
@@ -393,6 +515,55 @@ class MSDeformableAttention3D(BaseModule):
             output = multi_scale_deformable_attn_pytorch(
                 value, spatial_shapes, sampling_locations, attention_weights)
         if not self.batch_first:
-            output = output.permute(1, 0, 2)
+            output = output.permute(1, 0, 2) #_output 재배치
+
+
+
+        # 시각화 함수 정의
+        # def visualize_tensor(tensor, title, filename):
+        #     tensor_np = tensor.detach().cpu().numpy() # 텐서를 넘파이 배열로 변환
+        #     mean_tensor = np.mean(tensor_np, axis=0) # 텐서의 첫 번째 축을 기준으로 평균 계산
+        #     plt.figure(figsize=(10, 8)) # 그래프 크기
+        #     sns.heatmap(mean_tensor, cmap="viridis", annot=False) # 히트맵
+        #     plt.title(title) # 그래프 제목 
+        #     plt.xlabel('Features') # x축 레이블 # 특성
+        #     plt.ylabel('Tokens') # y축 레이블 # 토큰
+        #     plt.savefig(f'/home/hyun/local_storage/code/UniAD/projects/mmdet3d_plugin/uniad/modules/{filename}') # 그래프를 파일로 저장
+        #     plt.close()
+
+        # # 개별 텐서 시각화
+        # visualize_tensor(query, 'MSDA Query Tensor', 'MSDA_tensor_query.png')        # query 텐서 시각화
+        # visualize_tensor(key, 'MSDA Key Tensor', 'MSDA_tensor_key.png')              # key 텐서 시각화
+        # value = value.mean(dim=1)  # value 텐서의 처음 차원에 대한 평균을 계산, 2차원 텐서로 변환  
+        # visualize_tensor(value, 'MSDA Value Tensor', 'MSDA_tensor_value.png')        # value 텐서 시각화
+        # sampling_locations = sampling_locations.mean(dim=2)  # 4차원을 2차원으로 만들어주기 위해 2번째와 3번째 차원으로 평균 # 샘플링 위치 정의
+        # visualize_tensor(sampling_locations, 'MSDA sampling_locations Tensor', 'MSDA_sampling_locations.png')  # sampling_locations 텐서 시각화
+        # attention_weights = attention_weights.mean(axis=(2, 3))  # 4차원을 2차원으로 만들어주기 위해 2번째와 3번째 차원으로 평균 #각 샘플링 위치의 중요도 결정
+        # visualize_tensor(attention_weights, 'MSDA attention_weights Tensor', 'MSDA_attention_weights.png')  # attention_weights 텐서 시각화
 
         return output
+
+
+"""
+sampling_locations
+attention_weights
+
+첫 번째 차원 (dim=0)
+예시: tensor.mean(dim=0)
+배치 크기에 대한 평균
+
+
+두 번째 차원 (dim=1)
+예시: tensor.mean(dim=1)
+각 배치 내의 특성 또는 시퀀스 길이에 대한 평균
+
+
+마지막 차원 (dim=-1)
+예시: tensor.mean(dim=-1)
+각 시퀀스 또는 특성의 최종 값에 대한 평균
+
+
+중간 차원 (예: dim=2)
+예시: tensor.mean(dim=2)
+특정 특성의 평균
+"""

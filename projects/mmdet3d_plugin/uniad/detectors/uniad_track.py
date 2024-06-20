@@ -6,6 +6,9 @@
 
 import torch
 import torch.nn as nn
+import os
+import sys
+sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))
 from mmcv.runner import auto_fp16
 from mmdet.models import DETECTORS
 from mmdet3d.core import bbox3d2result
@@ -21,6 +24,7 @@ from mmdet.models.utils.transformer import inverse_sigmoid
 from ..dense_heads.track_head_plugin import MemoryBank, QueryInteractionModule, Instances, RuntimeTrackerBase
 
 @DETECTORS.register_module()
+# @DETECTORS.register_module(force=True) # 기존 항목 덮어쓰기 #디버깅
 class UniADTrack(MVXTwoStageDetector):
     """UniAD tracking part
     """
@@ -715,7 +719,8 @@ class UniADTrack(MVXTwoStageDetector):
     ):
         """only support bs=1 and sequential input"""
 
-        bs = img.size(0)
+        bs = img.size(0) #_ Batch Size
+        print(f"bs: {bs}")
         # img_metas = img_metas[0]
 
         """ init track instances for first frame """

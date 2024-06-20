@@ -4,7 +4,7 @@ from torch import nn
 from .track_instance import Instances
 
 # MemoryBank
-class MemoryBank(nn.Module):
+class MemoryBank(nn.Module): #QIM #TAN
 
     def __init__(self,
                  args,
@@ -88,8 +88,7 @@ class MemoryBank(nn.Module):
             self.update(track_instances)
         return track_instances
 
-
-# QIM
+#QIM # MOTR: End-to-End Multiple-Object Tracking with Transformer
 class QueryInteractionBase(nn.Module):
 
     def __init__(self, args, dim_in, hidden_dim, dim_out):
@@ -104,7 +103,7 @@ class QueryInteractionBase(nn.Module):
     def _reset_parameters(self):
         for p in self.parameters():
             if p.dim() > 1:
-                nn.init.xavier_uniform_(p)
+                nn.init.xavier_uniform_(p) #자비에르 유니폼?
 
     def _select_active_tracks(self, data: dict) -> Instances:
         raise NotImplementedError()
@@ -112,7 +111,8 @@ class QueryInteractionBase(nn.Module):
     def _update_track_embedding(self, track_instances):
         raise NotImplementedError()
 
-class QueryInteractionModule(QueryInteractionBase):
+class QueryInteractionModule(QueryInteractionBase): # Query Interaction Module #객체 출입 처리
+# 신생 객체는 Detection Queries를 통해 추가, 사라진 객체는 Track Queries를 통해 제거
 
     def __init__(self, args, dim_in, hidden_dim, dim_out):
         super().__init__(args, dim_in, hidden_dim, dim_out)
@@ -159,8 +159,7 @@ class QueryInteractionModule(QueryInteractionBase):
 
         # attention
         tgt = out_embed
-        tgt2 = self.self_attn(q[:, None], k[:, None], value=tgt[:, None])[0][:,
-                                                                             0]
+        tgt2 = self.self_attn(q[:, None], k[:, None], value=tgt[:, None])[0][:,0]
         tgt = tgt + self.dropout1(tgt2)
         tgt = self.norm1(tgt)
 
