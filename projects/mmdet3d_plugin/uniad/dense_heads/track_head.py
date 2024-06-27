@@ -171,20 +171,20 @@ class BEVFormerTrackHead(DETRHead):
         bev_embed_np = bev_embed[0].cpu().detach().numpy()  # 텐서를 GPU -> CPU로 이동, numpy 변환
         bev_embed_np = bev_embed_np.reshape(self.bev_h, self.bev_w, -1)  # bev_h bev_w으로 재구성, -1: 나머지 차원 자동 맞춤
 
-        # 여러 채널을 시각화하기 위한 반복문
-        num_channels = bev_embed_np.shape[-1]  # 채널 수 확인
-        channels_to_plot = [0] + list(range(4, num_channels, 5)) + [num_channels - 1]  # 0번째, 5번째마다, 마지막 채널 포함
+        # 여러 차원을 시각화하기 위한 반복문
+        num_dims = bev_embed_np.shape[-1]  # 차원 수 확인
+        dims_to_plot = [0] + list(range(4, num_dims, 5)) + [num_dims - 1]  # 0번째, 5번째마다, 마지막 차원 포함
 
-        for i in channels_to_plot:
+        for i in dims_to_plot:
             plt.figure(figsize=(10, 10))  # 시각화 Figure 생성, 크기 10x10
             
-            # i번째 채널 시각화
-            plt.imshow(bev_embed_np[:, :, i], cmap='viridis', interpolation='nearest')  # i번째 채널 시각화, 색상 맵 'viridis', 보간 'nearest' 사용
+            # i번째 차원 시각화
+            plt.imshow(bev_embed_np[:, :, i], cmap='viridis', interpolation='nearest')  # i번째 차원 시각화, 색상 맵 'viridis', 보간 'nearest' 사용
             plt.colorbar()
-            plt.title(f'BEV Feature Map - Channel {i}')
+            plt.title(f'BEV Feature Map - dim {i}')
             plt.xlabel('BEV Width')
             plt.ylabel('BEV Height') 
-            plt.savefig(f'/home/hyun/local_storage/code/UniAD/projects/mmdet3d_plugin/uniad/dense_heads/track_head-TrackFormer_Visualization/bev_features_channel_{i}.png')
+            plt.savefig(f'/home/hyun/local_storage/code/UniAD/projects/mmdet3d_plugin/uniad/dense_heads/track_head-TrackFormer_Visualization/bev_features_dim_{i}.png')
             plt.close()
 
         print("bev_embed shape:", bev_embed.shape)  # bev_embed shape
