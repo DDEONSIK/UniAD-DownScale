@@ -21,6 +21,7 @@ from projects.mmdet3d_plugin.core.bbox.util import normalize_bbox
 from mmcv.runner import force_fp32, auto_fp16
 
 import matplotlib.pyplot as plt
+import numpy as np
 
 
 @HEADS.register_module()
@@ -142,7 +143,7 @@ class BEVFormerTrackHead(DETRHead):
 
 
 
-    #TrackFormer에 들어가는 값 (Input):
+    #TrackFormer에 들어가는 값 (Input): #BEV OUTPUT
     def get_bev_features(self, mlvl_feats, img_metas, prev_bev=None): ###### multi level Feature로부터 BEV Features 추출
         bs, num_cam, _, _, _ = mlvl_feats[0].shape
         dtype = mlvl_feats[0].dtype # 리스트의 첫 번째 데이터 타입을 가져옴
@@ -163,12 +164,73 @@ class BEVFormerTrackHead(DETRHead):
             img_metas=img_metas,
         )
 
-        # BEV Features 시각화
-        plt.figure()
-        plt.title("BEV Features")
-        plt.imshow(bev_embed[0].cpu().detach().numpy())  # BEV Features 데이터를 이미지 형태로 시각화
-        plt.savefig('UniAD/projects/mmdet3d_plugin/uniad/dense_heads/bev_features.png')
-        plt.close()
+        # BEV 특징 맵의 형태 확인
+        print("bev_embed shape:", bev_embed.shape)  # bev_embed의 shape를 출력하여 올바르게 생성되었는지 확인
+
+        # BEV 특징 맵을 시각화하고 저장
+        bev_embed_np = bev_embed[0].cpu().detach().numpy()  # GPU에 있는 텐서를 CPU로 이동시키고 numpy 배열로 변환
+        bev_embed_np = bev_embed_np.reshape(self.bev_h, self.bev_w, -1)  # 특징 맵을 bev_h와 bev_w에 따라 재구성, -1은 나머지 차원을 자동으로 맞춤
+
+        plt.figure(figsize=(10, 10))  # 시각화할 Figure 객체 생성, 크기는 10x10 인치
+
+        # 첫 번째 채널만 시각화
+        plt.imshow(bev_embed_np[:, :, 0], cmap='hot', interpolation='nearest')  # 첫 번째 채널만 시각화, 색상 맵은 'hot', 보간 방법은 'nearest' 사용
+        plt.colorbar()  # 색상 막대 추가
+        plt.title('BEV Feature Map')  # 제목 추가
+        plt.xlabel('BEV Width')  # x축 라벨 추가
+        plt.ylabel('BEV Height')  # y축 라벨 추가
+        plt.savefig('/home/hyun/local_storage/code/UniAD/projects/mmdet3d_plugin/uniad/dense_heads/bev_features.png')  # 시각화 결과를 파일로 저장
+        plt.close()  # 시각화 창 닫기
+
+
+
+        # plt.figure()
+        # plt.title("BEV Features")
+        # plt.imshow(bev_embed[0].cpu().detach().numpy())  # BEV Features 데이터를 이미지 형태로 시각화
+        # plt.savefig('/home/hyun/local_storage/code/UniAD/projects/mmdet3d_plugin/uniad/dense_heads/bev_features.png')
+        # plt.close()
+
+
+        # def get_attention_maps(self, bev_queries, bev_h, bev_w): # 각 인코더 블록에서 attention map을 추출하는 메서드.
+        #     attention_maps = [] # attention map을 저장하기 위한 목록을 초기화
+        #     for layer in self.layers: # 각 인코더 블록을 반복
+        #         _, attn_map = layer.self_attn(bev_queries, return_attention=True) # 인코더 블록에서 attention map을 추출
+        #         attention_maps.append(attn_map) # attention map을 목록에 추가
+        #         bev_queries = layer(bev_queries) # 입력을 인코더 블록을 통해 전달
+        #     return attention_maps
+
+        # def plot_attention_maps(input_data, attn_maps, bev_h, bev_w, idx=0): # 주어진 input_data가 None이 아니면, idx에 해당하는 데이터를 numpy 배열로 변환
+        #     if input_data is not None: # input_data가 None인 경우 attn_maps의 길이를 기준으로 숫자 배열을 생성
+        #         input_data = input_data[idx].detach().cpu().numpy()
+        #     else:
+        #         input_data = np.arange(attn_maps[0][idx].shape[-1])
+        #     attn_maps = [m[idx].detach().cpu().numpy() for m in attn_maps] # 모든 attention map들을 CPU 메모리로 이동시키고 numpy 배열로 변환
+
+        #     num_heads = attn_maps[0].shape[0] # 첫 번째 attention map의 형태로부터 head의 수를 알아냄
+        #     num_layers = len(attn_maps) # attn_maps의 길이를 통해 레이어의 수를 알아냄
+        #     seq_len = input_data.shape[0] # input_data의 길이를 통해 시퀀스의 길이를 알아냄
+        #     fig_size = 4 if num_heads == 1 else 3 # head의 수에 따라 그림의 크기를 설정
+        #     fig, ax = plt.subplots(num_layers, num_heads, figsize=(bev_h, bev_w)) # num_layers와 num_heads를 사용하여 subplots를 생성
+        #     if num_layers == 1: # num_layers가 1이면, ax를 리스트 형태로 변경
+        #         ax = [ax]
+        #     if num_heads == 1: # num_heads가 1이면, ax를 2차원 리스트 형태로 변경
+        #         ax = [[a] for a in ax]
+        #     for row in range(num_layers): # 각 레이어와 head마다 attention map을 그림
+        #         for column in range(num_heads):
+        #             ax[row][column].imshow(attn_maps[row][column], origin="lower", vmin=0)
+        #             ax[row][column].set_xticks(list(range(seq_len)))
+        #             ax[row][column].set_xticklabels(input_data.tolist())
+        #             ax[row][column].set_yticks(list(range(seq_len)))
+        #             ax[row][column].set_yticklabels(input_data.tolist())
+        #             ax[row][column].set_title("Layer %i, Head %i" % (row + 1, column + 1))
+        #     fig.subplots_adjust(hspace=0.5) # subplot 간의 간격을 조정
+        #     #plt.savefig('savefig_4.png') #plt.show()
+        #     index = max([int(f.split('-')[-1].split('.')[0]) for f in os.listdir('/home/hyun/local_storage/code/..memo') if f.startswith('savefig_attention_maps-')] or [0]) + 1
+        #     plt.savefig(f'/home/hyun/local_storage/code/..memo/savefig_attention_maps-{index}.png')
+        #     plt.close()
+
+
+
 
         return bev_embed, bev_pos
 
@@ -254,7 +316,26 @@ class BEVFormerTrackHead(DETRHead):
         for det in outputs_coords:  # 각 객체 검출 결과를 반복
             for bbox in det:  # 각 객체의 경계 상자 좌표 추출
                 plt.plot(bbox[0].cpu().detach().numpy(), bbox[1].cpu().detach().numpy(), 'ro')  # 경계 상자 좌표를 빨간 점으로 시각화
-        plt.savefig('UniAD/projects/mmdet3d_plugin/uniad/dense_heads/detections.png')
+        plt.savefig('/home/hyun/local_storage/code/UniAD/projects/mmdet3d_plugin/uniad/dense_heads/detections.png')
+        plt.close()
+
+
+        # Detections 시각화
+        print("bev_embed shape:", bev_embed.shape)
+
+        # BEV 특징 맵을 시각화하고 저장
+        bev_embed_np = bev_embed[0].cpu().detach().numpy()
+        bev_embed_np = bev_embed_np.reshape(self.bev_h, self.bev_w, -1)
+
+        plt.figure(figsize=(10, 10))
+
+        # 첫 번째 채널만 시각화
+        plt.imshow(bev_embed_np[:, :, 0], cmap='hot', interpolation='nearest')
+        plt.colorbar()
+        plt.title('BEV Feature Map')
+        plt.xlabel('BEV Width')
+        plt.ylabel('BEV Height')
+        plt.savefig('/home/hyun/local_storage/code/UniAD/projects/mmdet3d_plugin/uniad/dense_heads/Detections.png')
         plt.close()
 
         return outs

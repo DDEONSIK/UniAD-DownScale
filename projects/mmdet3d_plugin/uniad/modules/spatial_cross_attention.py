@@ -145,7 +145,7 @@ class SpatialCrossAttention(BaseModule): #BaseModule: 상속받을 부모 클래
             query = query + query_pos
 
         bs, num_query, _ = query.size() #embed_dims: 128
-        print(f"bs: {bs}, num_query: {num_query}") #디버깅
+        # print(f"bs: {bs}, num_query: {num_query}") #디버깅
 
         D = reference_points_cam.size(3)
         indexes = []
@@ -171,10 +171,10 @@ class SpatialCrossAttention(BaseModule): #BaseModule: 상속받을 부모 클래
 
         key = key.permute(2, 0, 1, 3).reshape(
             bs * self.num_cams, l, self.embed_dims)
-        print(f"key: {key}") #디버깅
+        # print(f"key: {key}") #디버깅
         value = value.permute(2, 0, 1, 3).reshape(
             bs * self.num_cams, l, self.embed_dims)
-        print(f"value: {value}") #디버깅
+        # print(f"value: {value}") #디버깅
 
         queries = self.deformable_attention(query=queries_rebatch.view(bs*self.num_cams, max_len, self.embed_dims), key=key, value=value, #queries 값 보면 2?3?D가 아님 # num_cams 6
                                             reference_points=reference_points_rebatch.view(bs*self.num_cams, max_len, D, 2), spatial_shapes=spatial_shapes,
@@ -188,107 +188,37 @@ class SpatialCrossAttention(BaseModule): #BaseModule: 상속받을 부모 클래
         count = torch.clamp(count, min=1.0)
         slots = slots / count[..., None]
         slots = self.output_proj(slots) #2D로 변환 #_ 차원 섞여 있어서 하나로 맞춰줘야함
-        print(f"slots: {slots}") #디버깅
+        # print(f"slots: {slots}") #디버깅
 
-        # 시각화 함수
-        def visualize_tensor(tensor, title, filename):
-            tensor_np = tensor.detach().cpu().numpy() # 텐서를 넘파이 배열로 변환
-            mean_tensor = np.mean(tensor_np, axis=0) # 텐서의 첫 번째 축을 기준으로 평균 계산
-            plt.figure(figsize=(10, 8)) # 그래프 크기
-            sns.heatmap(mean_tensor, cmap="viridis", annot=False) # 히트맵
-            plt.title(title) # 그래프 제목 
-            plt.xlabel('Features') # x축 레이블 # 특성
-            plt.ylabel('Tokens') # y축 레이블 # 토큰
-            plt.savefig(f'/home/hyun/local_storage/code/UniAD/projects/mmdet3d_plugin/uniad/modules/{filename}') # 그래프를 파일로 저장
-            plt.close()
+        # # 시각화 함수
+        # def visualize_tensor(tensor, title, filename):
+        #     tensor_np = tensor.detach().cpu().numpy() # 텐서를 넘파이 배열로 변환
+        #     mean_tensor = np.mean(tensor_np, axis=0) # 텐서의 첫 번째 축을 기준으로 평균 계산
+        #     plt.figure(figsize=(10, 8)) # 그래프 크기
+        #     sns.heatmap(mean_tensor, cmap="viridis", annot=False) # 히트맵
+        #     plt.title(title) # 그래프 제목 
+        #     plt.xlabel('Features') # x축 레이블 # 특성
+        #     plt.ylabel('Tokens') # y축 레이블 # 토큰
+        #     plt.savefig(f'/home/hyun/local_storage/code/UniAD/projects/mmdet3d_plugin/uniad/modules/{filename}') # 그래프를 파일로 저장
+        #     plt.close()
 
-        # 개별 텐서 시각화
-        visualize_tensor(query, 'SCA Query Tensor', 'SCA_tensor_query.png')        # query 텐서 시각화
-        visualize_tensor(key, 'SCA Key Tensor', 'SCA_tensor_key.png')              # key 텐서 시각화
-        visualize_tensor(value, 'SCA Value Tensor', 'SCA_tensor_value.png')        # value 텐서 시각화
-        visualize_tensor(slots, 'SCA Slots Tensor', 'SCA_tensor_slots.png')        # slots 텐서 시각화 
+        # # 개별 텐서 시각화
+        # visualize_tensor(query, 'SCA Query Tensor', 'SCA_tensor_query.png')        # query 텐서 시각화
+        # visualize_tensor(key, 'SCA Key Tensor', 'SCA_tensor_key.png')              # key 텐서 시각화
+        # visualize_tensor(value, 'SCA Value Tensor', 'SCA_tensor_value.png')        # value 텐서 시각화
+        # visualize_tensor(slots, 'SCA Slots Tensor', 'SCA_tensor_slots.png')        # slots 텐서 시각화 
 
-        queries_2d_1 = queries.mean(dim=1)  # queries 텐서의 처음 차원에 대한 평균을 계산, 2차원 텐서로 변환 
-        visualize_tensor(queries_2d_1, 'SCA Queries Tensor 1', 'SCA_tensor_queries_1.png')  # queries_1 텐서 시각화
+        # queries_2d_1 = queries.mean(dim=1)  # queries 텐서의 처음 차원에 대한 평균을 계산, 2차원 텐서로 변환 
+        # visualize_tensor(queries_2d_1, 'SCA Queries Tensor 1', 'SCA_tensor_queries_1.png')  # queries_1 텐서 시각화
 
-        queries_2d__1 = queries.mean(dim=-1)  # queries 텐서의 마지막 차원에 대한 평균을 계산, 2차원 텐서로 변환
-        visualize_tensor(queries_2d__1, 'SCA Queries Tensor -1', 'SCA_tensor_queries_-1.png')  # queries_-1 텐서 시각화
+        # queries_2d__1 = queries.mean(dim=-1)  # queries 텐서의 마지막 차원에 대한 평균을 계산, 2차원 텐서로 변환
+        # visualize_tensor(queries_2d__1, 'SCA Queries Tensor -1', 'SCA_tensor_queries_-1.png')  # queries_-1 텐서 시각화
 
-        queries_2d__2 = queries.mean(dim=2)  # queries 텐서의 중간 차원에 대한 평균을 계산, 2차원 텐서로 변환
-        visualize_tensor(queries_2d__2, 'SCA Queries Tensor 2', 'SCA_tensor_queries_2.png')  # queries_-1 텐서 시각화
+        # queries_2d__2 = queries.mean(dim=2)  # queries 텐서의 중간 차원에 대한 평균을 계산, 2차원 텐서로 변환
+        # visualize_tensor(queries_2d__2, 'SCA Queries Tensor 2', 'SCA_tensor_queries_2.png')  # queries_-1 텐서 시각화
 
 
         return self.dropout(slots) + inp_residual
-
-
-
-    # ###########################################
-    # ###########################################
-    # ###########################################
-
-
-    # def get_attention_maps(self, x, mask=None): # 각 인코더 블록에서 attention map을 추출하는 메서드.
-    #     attention_maps = [] # attention map을 저장하기 위한 목록을 초기화
-    #     for layer in self.layers: # 각 인코더 블록을 반복
-    #         _, attn_map = layer.self_attn(x, mask=mask, return_attention=True) # 인코더 블록에서 attention map을 추출
-    #         attention_maps.append(attn_map) # attention map을 목록에 추가
-    #         x = layer(x) # 입력을 인코더 블록을 통해 전달
-    #     return attention_maps
-
-    # def plot_attention_maps(input_data, attn_maps, idx=0): # 주어진 input_data가 None이 아니면, idx에 해당하는 데이터를 numpy 배열로 변환
-    #     if input_data is not None: # input_data가 None인 경우 attn_maps의 길이를 기준으로 숫자 배열을 생성
-    #         input_data = input_data[idx].detach().cpu().numpy()
-    #     else:
-    #         input_data = np.arange(attn_maps[0][idx].shape[-1])
-    #     attn_maps = [m[idx].detach().cpu().numpy() for m in attn_maps] # 모든 attention map들을 CPU 메모리로 이동시키고 numpy 배열로 변환
-
-    #     num_heads = attn_maps[0].shape[0] # 첫 번째 attention map의 형태로부터 head의 수를 알아냄
-    #     num_layers = len(attn_maps) # attn_maps의 길이를 통해 레이어의 수를 알아냄
-    #     seq_len = input_data.shape[0] # input_data의 길이를 통해 시퀀스의 길이를 알아냄
-    #     fig_size = 4 if num_heads == 1 else 3 # head의 수에 따라 그림의 크기를 설정
-    #     fig, ax = plt.subplots(num_layers, num_heads, figsize=(num_heads * fig_size, num_layers * fig_size)) # num_layers와 num_heads를 사용하여 subplots를 생성
-    #     if num_layers == 1: # num_layers가 1이면, ax를 리스트 형태로 변경
-    #         ax = [ax]
-    #     if num_heads == 1: # num_heads가 1이면, ax를 2차원 리스트 형태로 변경
-    #         ax = [[a] for a in ax]
-    #     for row in range(num_layers): # 각 레이어와 head마다 attention map을 그림
-    #         for column in range(num_heads):
-    #             ax[row][column].imshow(attn_maps[row][column], origin="lower", vmin=0)
-    #             ax[row][column].set_xticks(list(range(seq_len)))
-    #             ax[row][column].set_xticklabels(input_data.tolist())
-    #             ax[row][column].set_yticks(list(range(seq_len)))
-    #             ax[row][column].set_yticklabels(input_data.tolist())
-    #             ax[row][column].set_title("Layer %i, Head %i" % (row + 1, column + 1))
-    #     fig.subplots_adjust(hspace=0.5) # subplot 간의 간격을 조정
-    #     #plt.savefig('savefig_4.png') #plt.show()
-    #     index = max([int(f.split('-')[-1].split('.')[0]) for f in os.listdir('/home/hyun/local_storage/code/..memo') if f.startswith('savefig_attention_maps-')] or [0]) + 1
-    #     plt.savefig(f'/home/hyun/local_storage/code/..memo/savefig_attention_maps-{index}.png')
-    #     plt.close()
-
-    # plot_attention_maps(data_input, attention_maps, idx=0) # `plot_attention_maps` 함수를 호출하여 주어진 입력 데이터와 attention map을 시각화
-
-    # DATA_MEANS = np.array([0.485, 0.456, 0.406])
-    # DATA_STD = np.array([0.229, 0.224, 0.225])
-
-    # TORCH_DATA_MEANS = torch.from_numpy(DATA_MEANS).view(1, 3, 1, 1)
-    # TORCH_DATA_STD = torch.from_numpy(DATA_STD).view(1, 3, 1, 1)
-
-    # SET_SIZE = 10 # 집합의 크기를 10으로 설정함
-
-    # # `anomaly_model`의 내부 attention 맵(어텐션 가중치)을 가져옴. 이 가중치들은 입력 데이터의 각 부분에 얼마나 주의를 기울이는지 나타냄
-    # attention_maps = anomaly_model.get_attention_maps(inp_data, add_positional_encoding=False)
-    # # 예측 결과 중 가장 높은 확률값을 가진 클래스의 인덱스를 반환하여 최종 예측값을 구함.
-    # predictions = preds.argmax(dim=-1)
-
-    # def visualize_prediction(idx): # 주어진 인덱스의 이미지와 해당 이미지에 대한 어텐션 맵을 시각화하는 함수를 정의
-    #     print("Prediction:", predictions[idx].item()) # 해당 이미지에 대한 모델의 예측값을 출력
-    #     plot_attention_maps(input_data=None, attn_maps=attention_maps, idx=idx) # idx번째 이미지에 대한 어텐션 맵을 시각화. `plot_attention_maps` 함수는 여기 제공되지 않았지만, 입력 데이터와 어텐션 맵을 받아 시각화를 수행한다고 추정
-
-
-
-    # ###########################################
-    # ###########################################
-    # ###########################################
 
 
 @ATTENTION.register_module()
