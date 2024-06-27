@@ -184,7 +184,7 @@ class BEVFormerTrackHead(DETRHead):
             plt.title(f'BEV Feature Map - Channel {i}')
             plt.xlabel('BEV Width')
             plt.ylabel('BEV Height') 
-            plt.savefig(f'/home/hyun/local_storage/code/UniAD/projects/mmdet3d_plugin/uniad/dense_heads/bev_features_channel_{i}.png')
+            plt.savefig(f'/home/hyun/local_storage/code/UniAD/projects/mmdet3d_plugin/uniad/dense_heads/track_head-TrackFormer_Visualization/bev_features_channel_{i}.png')
             plt.close()
 
         print("bev_embed shape:", bev_embed.shape)  # bev_embed shape
