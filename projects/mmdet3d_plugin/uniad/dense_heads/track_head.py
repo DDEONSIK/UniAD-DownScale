@@ -164,30 +164,51 @@ class BEVFormerTrackHead(DETRHead):
             img_metas=img_metas,
         )
 
-        # BEV 형태 확인
-        print("bev_embed shape:", bev_embed.shape)  # bev_embed shape
+        # BEV feature map 형태 확인
+        print("bev_embed shape:", bev_embed.shape)  # bev_embed의 shape를 출력하여 올바르게 생성되었는지 확인
 
-        # BEV 시각화
-        bev_embed_np = bev_embed[0].cpu().detach().numpy()  # 텐서를 GPU -> CPU로 이동, numpy 변환
-        bev_embed_np = bev_embed_np.reshape(self.bev_h, self.bev_w, -1)  # bev_h bev_w으로 재구성, -1: 나머지 차원 자동 맞춤
+        # BEV feature map 시각화
+        bev_embed_np = bev_embed[0].cpu().detach().numpy()  # GPU에 있는 텐서 -> CPU로 이동, numpy 배열로 변환
+        bev_embed_np = bev_embed_np.reshape(self.bev_h, self.bev_w, -1)  # feature map을 bev_h와 bev_w로 reshape, -1: 나머지 차원을 자동으로 맞춤
+
+        # 각 차원에 대해 최댓값, 합, 평균값 계산
+        bev_max = np.max(bev_embed_np, axis=2)
+        bev_sum = np.sum(bev_embed_np, axis=2)
+        bev_avg = np.mean(bev_embed_np, axis=2)
+
+        visualizations = {
+            'max': bev_max,
+            'sum': bev_sum,
+            'avg': bev_avg
+        }
+
+        # 시각화
+        for key, value in visualizations.items():
+            plt.figure(figsize=(10, 10))  # Figure 생성, 크기 10x10
+            
+            plt.imshow(value, cmap='viridis', interpolation='nearest')  # 값 시각화, 색상: 'viridis', 보간: 'nearest'
+            plt.colorbar() 
+            plt.title(f'BEV Feature Map - {key}')
+            plt.xlabel('BEV Width') 
+            plt.ylabel('BEV Height') 
+            plt.savefig(f'/home/hyun/local_storage/code/UniAD/projects/mmdet3d_plugin/uniad/dense_heads/track_head-TrackFormer_Visualization/bev_features_{key}.png')  # 결과 저장
+            plt.close()
 
         # 여러 차원을 시각화하기 위한 반복문
         num_dims = bev_embed_np.shape[-1]  # 차원 수 확인
         dims_to_plot = [0] + list(range(4, num_dims, 5)) + [num_dims - 1]  # 0번째, 5번째마다, 마지막 차원 포함
 
         for i in dims_to_plot:
-            plt.figure(figsize=(10, 10))  # 시각화 Figure 생성, 크기 10x10
+            plt.figure(figsize=(10, 10))  # Figure 생성, 크기 10x10
             
             # i번째 차원 시각화
-            plt.imshow(bev_embed_np[:, :, i], cmap='viridis', interpolation='nearest')  # i번째 차원 시각화, 색상 맵 'viridis', 보간 'nearest' 사용
-            plt.colorbar()
+            plt.imshow(bev_embed_np[:, :, i], cmap='viridis', interpolation='nearest')  # i번째 차원 시각화, 색상: 'viridis', 보간: 'nearest'
+            plt.colorbar() 
             plt.title(f'BEV Feature Map - dim {i}')
-            plt.xlabel('BEV Width')
+            plt.xlabel('BEV Width') 
             plt.ylabel('BEV Height') 
-            plt.savefig(f'/home/hyun/local_storage/code/UniAD/projects/mmdet3d_plugin/uniad/dense_heads/track_head-TrackFormer_Visualization/bev_features_dim_{i}.png')
+            plt.savefig(f'/home/hyun/local_storage/code/UniAD/projects/mmdet3d_plugin/uniad/dense_heads/track_head-TrackFormer_Visualization/bev_features_dim_{i}.png')  # 결과 저장
             plt.close()
-
-        print("bev_embed shape:", bev_embed.shape)  # bev_embed shape
 
         return bev_embed, bev_pos
 
