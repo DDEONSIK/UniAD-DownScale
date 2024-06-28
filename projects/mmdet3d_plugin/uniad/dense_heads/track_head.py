@@ -164,56 +164,57 @@ class BEVFormerTrackHead(DETRHead):
             img_metas=img_metas,
         )
 
-        # BEV feature map 형태 확인
-        print("bev_embed shape:", bev_embed.shape)  # bev_embed의 shape를 출력하여 올바르게 생성되었는지 확인
+        # # BEV feature map 형태 확인
+        # print("bev_embed shape:", bev_embed.shape)  # bev_embed shape 확인
 
-        # BEV feature map 시각화
-        bev_embed_np = bev_embed[0].cpu().detach().numpy()  # GPU에 있는 텐서 -> CPU로 이동, numpy 배열로 변환
-        bev_embed_np = bev_embed_np.reshape(self.bev_h, self.bev_w, -1)  # feature map을 bev_h와 bev_w로 reshape, -1: 나머지 차원을 자동으로 맞춤
+        # # BEV feature map 시각화
+        # bev_embed_np = bev_embed[0].cpu().detach().numpy()  # GPU에 있는 텐서 -> CPU로 이동, numpy 배열로 변환
+        # bev_embed_np = bev_embed_np.reshape(self.bev_h, self.bev_w, -1)  # feature map을 bev_h와 bev_w로 reshape, -1: 나머지 차원을 자동으로 맞춤
 
-        # 각 차원에 대해 최댓값, 합, 평균값 계산
-        bev_max = np.max(bev_embed_np, axis=2)
-        bev_sum = np.sum(bev_embed_np, axis=2)
-        bev_avg = np.mean(bev_embed_np, axis=2)
+        # # 각 차원에 대해 최댓값, 합, 평균값 계산
+        # bev_max = np.max(bev_embed_np, axis=2)
+        # bev_sum = np.sum(bev_embed_np, axis=2)
+        # bev_avg = np.mean(bev_embed_np, axis=2)
 
-        visualizations = {
-            'max': bev_max,
-            'sum': bev_sum,
-            'avg': bev_avg
-        }
+        # visualizations = {
+        #     'max': bev_max,
+        #     'sum': bev_sum,
+        #     'avg': bev_avg
+        # }
 
-        # 시각화
-        for key, value in visualizations.items():
-            plt.figure(figsize=(10, 10))  # Figure 생성, 크기 10x10
+        # # 시각화
+        # for key, value in visualizations.items():
+        #     plt.figure(figsize=(10, 10))  # Figure 생성, 크기 10x10
             
-            plt.imshow(value, cmap='viridis', interpolation='nearest')  # 값 시각화, 색상: 'viridis', 보간: 'nearest'
-            plt.colorbar() 
-            plt.title(f'BEV Feature Map - {key}')
-            plt.xlabel('BEV Width') 
-            plt.ylabel('BEV Height') 
-            plt.savefig(f'/home/hyun/local_storage/code/UniAD/projects/mmdet3d_plugin/uniad/dense_heads/track_head-TrackFormer_Visualization/bev_features_{key}.png')  # 결과 저장
-            plt.close()
+        #     plt.imshow(value, cmap='viridis', interpolation='nearest')  # 값 시각화, 색상: 'viridis', 보간: 'nearest'
+        #     plt.colorbar() 
+        #     plt.title(f'BEV Feature Map - {key}')
+        #     plt.xlabel('BEV Width') 
+        #     plt.ylabel('BEV Height') 
+        #     plt.savefig(f'/home/hyun/local_storage/code/UniAD/projects/mmdet3d_plugin/uniad/dense_heads/track_head-TrackFormer_Visualization/bev_features_{key}.png')  # 결과 저장
+        #     plt.close()
 
-        # 여러 차원을 시각화하기 위한 반복문
-        num_dims = bev_embed_np.shape[-1]  # 차원 수 확인
-        dims_to_plot = [0] + list(range(4, num_dims, 5)) + [num_dims - 1]  # 0번째, 5번째마다, 마지막 차원 포함
+        # # 여러 차원을 시각화하기 위한 반복문
+        # num_dims = bev_embed_np.shape[-1]  # 차원 수 확인
+        # dims_to_plot = [0] + list(range(4, num_dims, 5)) + [num_dims - 1]  # 0번째, 5번째마다, 마지막 차원 포함
 
-        for i in dims_to_plot:
-            plt.figure(figsize=(10, 10))  # Figure 생성, 크기 10x10
+        # for i in dims_to_plot:
+        #     plt.figure(figsize=(10, 10))  # Figure 생성, 크기 10x10
             
-            # i번째 차원 시각화
-            plt.imshow(bev_embed_np[:, :, i], cmap='viridis', interpolation='nearest')  # i번째 차원 시각화, 색상: 'viridis', 보간: 'nearest'
-            plt.colorbar() 
-            plt.title(f'BEV Feature Map - dim {i}')
-            plt.xlabel('BEV Width') 
-            plt.ylabel('BEV Height') 
-            plt.savefig(f'/home/hyun/local_storage/code/UniAD/projects/mmdet3d_plugin/uniad/dense_heads/track_head-TrackFormer_Visualization/bev_features_dim_{i}.png')  # 결과 저장
-            plt.close()
+        #     # i번째 차원 시각화
+        #     plt.imshow(bev_embed_np[:, :, i], cmap='viridis', interpolation='nearest')  # i번째 차원 시각화, 색상: 'viridis', 보간: 'nearest'
+        #     plt.colorbar() 
+        #     plt.title(f'BEV Feature Map - dim {i}')
+        #     plt.xlabel('BEV Width') 
+        #     plt.ylabel('BEV Height') 
+        #     plt.savefig(f'/home/hyun/local_storage/code/UniAD/projects/mmdet3d_plugin/uniad/dense_heads/track_head-TrackFormer_Visualization/bev_features_dim_{i}.png')  # 결과 저장
+        #     plt.close()
 
         return bev_embed, bev_pos
 
 
-    #TrackFormer에서 계산되는 과정 (Processing):
+
+    # TrackFormer에서 계산되는 과정 (Processing):
     def get_detections( ####### BEV Feature와 Object Query를 기반으로 객체 검출
         self, 
         bev_embed,
@@ -221,7 +222,10 @@ class BEVFormerTrackHead(DETRHead):
         ref_points=None,
         img_metas=None,
     ):
-        assert bev_embed.shape[0] == self.bev_h * self.bev_w
+        assert bev_embed.shape[0] == self.bev_h * self.bev_w  # bev_embed의 첫 번째 차원이 bev_h * bev_w인지 확인 (입력 크기 검증), 
+        print('bev_embed', bev_embed.shape) #torch.Size([40000, 1, 128])
+
+        # Transformer에서 상태와 ref_point을 가져옴
         hs, init_reference, inter_references = self.transformer.get_states_and_refs(
             bev_embed,
             object_query_embeds,
@@ -232,91 +236,133 @@ class BEVFormerTrackHead(DETRHead):
             cls_branches=self.cls_branches if self.as_two_stage else None,
             img_metas=img_metas,
         )
-        hs = hs.permute(0, 2, 1, 3)
-        outputs_classes = []
-        outputs_coords = []
-        outputs_trajs = []
-        for lvl in range(hs.shape[0]):
-            if lvl == 0:
-                # reference = init_reference
-                reference = ref_points.sigmoid()
-            else:
-                reference = inter_references[lvl - 1]
-                # ref_size_base = inter_box_sizes[lvl - 1]
-            reference = inverse_sigmoid(reference)
-            outputs_class = self.cls_branches[lvl](hs[lvl])
-            tmp = self.reg_branches[lvl](hs[lvl])  # xydxdyxdz
-            outputs_past_traj = self.past_traj_reg_branches[lvl](hs[lvl]).view( #궤적 예측
-                tmp.shape[0], -1, self.past_steps + self.fut_steps, 2)
-            # TODO: check the shape of reference
-            assert reference.shape[-1] == 3
-            tmp[..., 0:2] += reference[..., 0:2]
-            tmp[..., 0:2] = tmp[..., 0:2].sigmoid()
-            tmp[..., 4:5] += reference[..., 2:3]
-            tmp[..., 4:5] = tmp[..., 4:5].sigmoid()
 
-            last_ref_points = torch.cat( #추적 과정에서 객체의 현재 위치와 이동 방향을 파악하는 데 사용
+        print('hs_B', hs.shape) #torch.Size([4, 901, 1, 128])
+        #(num_layers, num_queries, batch_size, embed_dim)
+
+        hs = hs.permute(0, 2, 1, 3)  # 차원 순서 변경. 형태 변환
+        print('hs_A', hs.shape) #torch.Size([4, 1, 901, 128])
+        #(num_layers, batch_size, num_queries, embed_dim)
+
+        outputs_classes = []  # 클래스 예측 결과를 저장할 리스트 초기화
+        outputs_coords = []   # 좌표 예측 결과를 저장할 리스트 초기화
+        outputs_trajs = []    # 궤적 예측 결과를 저장할 리스트 초기화
+
+        for lvl in range(hs.shape[0]):  # 각 레이어에 대해 반복
+            if lvl == 0:
+                reference = ref_points.sigmoid()  # 첫 번째 레이어에서는 ref_point을 sigmoid로 변환
+                print('reference_1', reference.shape) #reference_1 torch.Size([901, 3]) #(num_q, dim)
+            else:
+                reference = inter_references[lvl - 1]  # 그 외의 레이어에서는 이전 레이어의 ref_point 사용
+                print('reference_2', reference.shape)
+            reference = inverse_sigmoid(reference)  # ref_point을 inverse_sigmoid로 변환
+            print('reference_3', reference.shape)
+
+            outputs_class = self.cls_branches[lvl](hs[lvl])  # 현재 레이어의 클래스 예측 계산
+            print('outputs_class', outputs_class.shape) #outputs_class torch.Size([1, 901, 10]) 
+            #(bs, num_q, num_class)
+
+            tmp = self.reg_branches[lvl](hs[lvl])  # 현재 레이어의 좌표 예측 계산
+            print('tmp', tmp.shape) #tmp torch.Size([1, 901, 10]) 
+            #(bs, num_q, num_coords)
+
+            # 궤적 예측 계산
+            outputs_past_traj = self.past_traj_reg_branches[lvl](hs[lvl]).view(
+                tmp.shape[0], -1, self.past_steps + self.fut_steps, 2)
+            print('outputs_past_traj', outputs_past_traj.shape) #outputs_past_traj torch.Size([1, 901, 8, 2]) 
+            #(bs, num_q, len_traj(past_steps + fut_steps), 2D_traj_point)
+            
+            # TODO: check the shape of reference
+            assert reference.shape[-1] == 3  # ref_point의 마지막 차원이 3인지 확인 (검증)
+            print('reference_lastDim', reference.shape) #reference_lastDim torch.Size([901, 3])
+
+            tmp[..., 0:2] += reference[..., 0:2]  # ref_point의 x, y 좌표를 예측값에 더함
+            tmp[..., 0:2] = tmp[..., 0:2].sigmoid()  # x, y 좌표에 sigmoid 적용
+            tmp[..., 4:5] += reference[..., 2:3]  # ref_point의 z 좌표를 예측값에 더함
+            tmp[..., 4:5] = tmp[..., 4:5].sigmoid()  # z 좌표에 sigmoid 적용
+
+            last_ref_points = torch.cat(  # 마지막 ref_point 계산
                 [tmp[..., 0:2], tmp[..., 4:5]], dim=-1,
             )
+            print('last_ref_points_lastDim', last_ref_points.shape) #last_ref_points_lastDim torch.Size([1, 901, 3])
 
-            tmp[..., 0:1] = (tmp[..., 0:1] * (self.pc_range[3] -
-                             self.pc_range[0]) + self.pc_range[0])
-            tmp[..., 1:2] = (tmp[..., 1:2] * (self.pc_range[4] -
-                             self.pc_range[1]) + self.pc_range[1])
-            tmp[..., 4:5] = (tmp[..., 4:5] * (self.pc_range[5] -
-                             self.pc_range[2]) + self.pc_range[2])
+            tmp[..., 0:1] = (tmp[..., 0:1] * (self.pc_range[3] - self.pc_range[0]) + self.pc_range[0])  # x 좌표 변환
+            tmp[..., 1:2] = (tmp[..., 1:2] * (self.pc_range[4] - self.pc_range[1]) + self.pc_range[1])  # y 좌표 변환
+            tmp[..., 4:5] = (tmp[..., 4:5] * (self.pc_range[5] - self.pc_range[2]) + self.pc_range[2])  # z 좌표 변환
 
-            # tmp[..., 2:4] = tmp[..., 2:4] + ref_size_basse[..., 0:2]
-            # tmp[..., 5:6] = tmp[..., 5:6] + ref_size_basse[..., 2:3]
+            # tmp[..., 2:4] = tmp[..., 2:4] + ref_size_basse[..., 0:2]  # 너비와 높이 변환 (사용 안 함)
+            # tmp[..., 5:6] = tmp[..., 5:6] + ref_size_basse[..., 2:3]  # 깊이 변환 (사용 안 함)
 
             # TODO: check if using sigmoid
-            outputs_coord = tmp
-            outputs_classes.append(outputs_class)
-            outputs_coords.append(outputs_coord)
-            outputs_trajs.append(outputs_past_traj)
-        outputs_classes = torch.stack(outputs_classes)
-        outputs_coords = torch.stack(outputs_coords)
-        outputs_trajs = torch.stack(outputs_trajs)
-        last_ref_points = inverse_sigmoid(last_ref_points)
+            outputs_coord = tmp  # 변환된 좌표를 outputs_coord에 저장
+
+            outputs_classes.append(outputs_class)  # 클래스 예측 결과를 리스트에 추가
+            outputs_coords.append(outputs_coord)   # 좌표 예측 결과를 리스트에 추가
+            outputs_trajs.append(outputs_past_traj)  # 궤적 예측 결과를 리스트에 추가
+
+        outputs_classes = torch.stack(outputs_classes)  # 클래스 예측 결과를 텐서로 변환
+        print('outputs_class_result', outputs_class.shape) #outputs_class_result torch.Size([1, 901, 10]) 
+        #(bs, num_q, num_class)
+
+        outputs_coords = torch.stack(outputs_coords)    # 좌표 예측 결과를 텐서로 변환
+        print('outputs_coords_result', outputs_coords.shape) #outputs_coords_result torch.Size([4, 1, 901, 10]) 
+        #(num_layers, bs, num_queries, num_coords)
+
+        outputs_trajs = torch.stack(outputs_trajs)      # 궤적 예측 결과를 텐서로 변환
+        print('outputs_trajs_result', outputs_trajs.shape) #outputs_trajs_result torch.Size([4, 1, 901, 8, 2])
+        #(num_layers, bs, num_queries, len_traj, 2D_traj_point)
+
+        last_ref_points = inverse_sigmoid(last_ref_points)  # 마지막 ref_point에 inverse_sigmoid 적용
+        print('last_ref_points_result', last_ref_points.shape) #last_ref_points_result torch.Size([1, 901, 3])
+        #(batch_size, num_queries, dim_ref_points)
+
+        # 결과를 딕셔너리로 저장
         outs = {
-            'all_cls_scores': outputs_classes,
-            'all_bbox_preds': outputs_coords,
-            'all_past_traj_preds': outputs_trajs,
-            'enc_cls_scores': None,
-            'enc_bbox_preds': None,
-            'last_ref_points': last_ref_points,
-            'query_feats': hs,
+            'all_cls_scores': outputs_classes,  # 모든 클래스 점수
+            'all_bbox_preds': outputs_coords,   # 모든 바운딩 박스 예측
+            'all_past_traj_preds': outputs_trajs,  # 모든 궤적 예측
+            'enc_cls_scores': None,  # 인코더 클래스 점수 (현재 None)
+            'enc_bbox_preds': None,  # 인코더 바운딩 박스 예측 (현재 None)
+            'last_ref_points': last_ref_points,  # 마지막 ref_point
+            'query_feats': hs,  # 쿼리 피처
         }
 
-        # Detections 시각화
-        plt.figure()
-        plt.title("Detections") 
-        for det in outputs_coords:  # 각 객체 검출 결과를 반복
-            for bbox in det:  # 각 객체의 경계 상자 좌표 추출
-                plt.plot(bbox[0].cpu().detach().numpy(), bbox[1].cpu().detach().numpy(), 'ro')  # 경계 상자 좌표를 빨간 점으로 시각화
-        plt.savefig('/home/hyun/local_storage/code/UniAD/projects/mmdet3d_plugin/uniad/dense_heads/detections.png')
-        plt.close()
 
 
-        # Detections 시각화
-        print("bev_embed shape:", bev_embed.shape)
 
-        # BEV 특징 맵을 시각화하고 저장
-        bev_embed_np = bev_embed[0].cpu().detach().numpy()
-        bev_embed_np = bev_embed_np.reshape(self.bev_h, self.bev_w, -1)
-
-        plt.figure(figsize=(10, 10))
-
-        # 첫 번째 채널만 시각화
-        plt.imshow(bev_embed_np[:, :, 0], cmap='hot', interpolation='nearest')
+        # Attention Heatmap 시각화
+        print("hs_outs(query_feats):", hs.shape)
+        attention_map = hs.max(dim=3)[0].cpu().detach().numpy()  # max값을 뽑아냄
+        attention_map = attention_map.reshape(self.bev_h, self.bev_w, -1)
+        
+        plt.figure(figsize=(self.bev_h, self.bev_w))
+        plt.imshow(attention_map, cmap='viridis', interpolation='nearest')
         plt.colorbar()
-        plt.title('BEV Feature Map')
+        plt.title('Attention Heatmap')
         plt.xlabel('BEV Width')
         plt.ylabel('BEV Height')
-        plt.savefig('/home/hyun/local_storage/code/UniAD/projects/mmdet3d_plugin/uniad/dense_heads/Detections.png')
+        plt.savefig('/home/hyun/local_storage/code/UniAD/projects/mmdet3d_plugin/uniad/dense_heads/track_head-TrackFormer_Visualization/attention_heatmap.png')
         plt.close()
 
-        return outs
+        # 궤적 시각화
+        print("outputs_trajs:", outputs_trajs.shape)
+        trajectories = outputs_trajs.cpu().detach().numpy()
+        plt.figure(figsize=(self.bev_h, self.bev_w))
+        for traj in trajectories[0]:  # batch size가 1이라고 가정
+            for q in traj:  # num_queries
+                past_traj = q[:self.past_steps]
+                fut_traj = q[self.past_steps:]
+                plt.plot(past_traj[:, 0], past_traj[:, 1], 'r-')  # 과거 궤적
+                plt.plot(fut_traj[:, 0], fut_traj[:, 1], 'g-')  # 미래 궤적
+
+        plt.title('Trajectories')
+        plt.xlabel('X')
+        plt.ylabel('Y')
+        plt.savefig('/home/hyun/local_storage/code/UniAD/projects/mmdet3d_plugin/uniad/dense_heads/track_head-TrackFormer_Visualization/trajectories.png')
+        plt.close()
+
+
+        return outs  # 결과 반환
 
 
 
