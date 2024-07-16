@@ -406,7 +406,7 @@ model = dict(
         )
     ),
 )
-dataset_type = "NuScenesE2EDataset"
+dataset_type = "NuScenesE2EDataset" 
 data_root = "/home/hyun/local_storage/code/UniAD/data/nuscenes/" #_"data/nuscenes/" 
 info_root = "/home/hyun/local_storage/code/UniAD/data/infos/" #_"data/infos/"
 file_client_args = dict(backend="disk")

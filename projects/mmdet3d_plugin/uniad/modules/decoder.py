@@ -32,16 +32,12 @@ ext_module = ext_loader.load_ext(
 
 
 def inverse_sigmoid(x, eps=1e-5):
-    """Inverse function of sigmoid.
+    """Sigmoid 역함수.
     Args:
-        x (Tensor): The tensor to do the
-            inverse.
-        eps (float): EPS avoid numerical
-            overflow. Defaults 1e-5.
+        x (Tensor): 역함수를 적용할 텐서.
+        eps (float): 수치적 오버플로우를 피하기 위한 작은 값. 기본값 1e-5.
     Returns:
-        Tensor: The x has passed the inverse
-            function of sigmoid, has same
-            shape with input.
+        Tensor: Sigmoid 역함수를 통과한 텐서, 입력과 동일한 shape.
     """
     x = x.clamp(min=0, max=1)
     x1 = x.clamp(min=eps)
@@ -51,11 +47,10 @@ def inverse_sigmoid(x, eps=1e-5):
 
 @TRANSFORMER_LAYER_SEQUENCE.register_module()
 class DetectionTransformerDecoder(TransformerLayerSequence):
-    """Implements the decoder in DETR3D transformer.
+    """DETR3D transformer에서 디코더를 구현.
     Args:
-        return_intermediate (bool): Whether to return intermediate outputs.
-        coder_norm_cfg (dict): Config of last normalization layer. Default：
-            `LN`.
+        return_intermediate (bool): 중간 출력을 반환할지 여부.
+        coder_norm_cfg (dict): 마지막 정규화 레이어 설정. 기본값: `LN`.
     """
 
     def __init__(self, *args, return_intermediate=False, **kwargs):
@@ -70,22 +65,13 @@ class DetectionTransformerDecoder(TransformerLayerSequence):
                 reg_branches=None,
                 key_padding_mask=None,
                 **kwargs):
-        """Forward function for `Detr3DTransformerDecoder`.
+        """`Detr3DTransformerDecoder`의 forward 함수.
         Args:
-            query (Tensor): Input query with shape
-                `(num_query, bs, embed_dims)`.
-            reference_points (Tensor): The reference
-                points of offset. has shape
-                (bs, num_query, 4) when as_two_stage,
-                otherwise has shape ((bs, num_query, 2).
-            reg_branch: (obj:`nn.ModuleList`): Used for
-                refining the regression results. Only would
-                be passed when with_box_refine is True,
-                otherwise would be passed a `None`.
+            query (Tensor): shape `(num_query, bs, embed_dims)`의 입력 쿼리.
+            reference_points (Tensor): 옵셋의 참조 포인트. shape (bs, num_query, 4) as_two_stage, 그렇지 않으면 shape (bs, num_query, 2).
+            reg_branch: (obj:`nn.ModuleList`): 회귀 결과를 정제하기 위해 사용됨. with_box_refine이 True일 때만 전달됨.
         Returns:
-            Tensor: Results with shape [1, num_query, bs, embed_dims] when
-                return_intermediate is `False`, otherwise it has shape
-                [num_layers, num_query, bs, embed_dims].
+            Tensor: 결과 shape [1, num_query, bs, embed_dims] (return_intermediate가 `False`일 때), 그렇지 않으면 [num_layers, num_query, bs, embed_dims].
         """
         output = query
         intermediate = []
@@ -131,30 +117,19 @@ class DetectionTransformerDecoder(TransformerLayerSequence):
 
 @ATTENTION.register_module()
 class CustomMSDeformableAttention(BaseModule):
-    """An attention module used in Deformable-Detr.
-
+    """Deformable-Detr에서 사용되는 attention 모듈.
     `Deformable DETR: Deformable Transformers for End-to-End Object Detection.
     <https://arxiv.org/pdf/2010.04159.pdf>`_.
-
     Args:
-        embed_dims (int): The embedding dimension of Attention.
-            Default: 256.
-        num_heads (int): Parallel attention heads. Default: 64.
-        num_levels (int): The number of feature map used in
-            Attention. Default: 4.
-        num_points (int): The number of sampling points for
-            each query in each head. Default: 4.
-        im2col_step (int): The step used in image_to_column.
-            Default: 64.
-        dropout (float): A Dropout layer on `inp_identity`.
-            Default: 0.1.
-        batch_first (bool): Key, Query and Value are shape of
-            (batch, n, embed_dim)
-            or (n, batch, embed_dim). Default to False.
-        norm_cfg (dict): Config dict for normalization layer.
-            Default: None.
-        init_cfg (obj:`mmcv.ConfigDict`): The Config for initialization.
-            Default: None.
+        embed_dims (int): Attention의 임베딩 차원. 기본값: 256.
+        num_heads (int): 병렬 attention 헤드 수. 기본값: 64.
+        num_levels (int): Attention에서 사용되는 특징 맵 수. 기본값: 4.
+        num_points (int): 각 헤드에서 각 쿼리에 대해 샘플링 포인트 수. 기본값: 4.
+        im2col_step (int): image_to_column에서 사용되는 스텝. 기본값: 64.
+        dropout (float): `inp_identity`에서 드롭아웃 레이어. 기본값: 0.1.
+        batch_first (bool): Key, Query 및 Value의 shape이 (batch, n, embed_dim) 또는 (n, batch, embed_dim). 기본값: False.
+        norm_cfg (dict): 정규화 레이어에 대한 설정 dict. 기본값: None.
+        init_cfg (obj:`mmcv.ConfigDict`): 초기화 설정. 기본값: None.
     """
 
     def __init__(self,
@@ -178,8 +153,7 @@ class CustomMSDeformableAttention(BaseModule):
         self.batch_first = batch_first
         self.fp16_enabled = False
 
-        # you'd better set dim_per_head to a power of 2
-        # which is more efficient in the CUDA implementation
+        # CUDA 구현에서 더 효율적인지 확인하려면 dim_per_head를 2의 거듭제곱으로 설정하는 것이 좋습니다
         def _is_power_of_2(n):
             if (not isinstance(n, int)) or (n < 0):
                 raise ValueError(
@@ -208,7 +182,7 @@ class CustomMSDeformableAttention(BaseModule):
         self.init_weights()
 
     def init_weights(self):
-        """Default initialization for Parameters of Module."""
+        """모듈의 파라미터에 대한 기본 초기화."""
         constant_init(self.sampling_offsets, 0.)
         thetas = torch.arange(
             self.num_heads,
@@ -241,40 +215,22 @@ class CustomMSDeformableAttention(BaseModule):
                 level_start_index=None,
                 flag='decoder',
                 **kwargs):
-        """Forward Function of MultiScaleDeformAttention.
-
+        """MultiScaleDeformAttention의 Forward 함수.
         Args:
-            query (Tensor): Query of Transformer with shape
-                (num_query, bs, embed_dims).
-            key (Tensor): The key tensor with shape
-                `(num_key, bs, embed_dims)`.
-            value (Tensor): The value tensor with shape
-                `(num_key, bs, embed_dims)`.
-            identity (Tensor): The tensor used for addition, with the
-                same shape as `query`. Default None. If None,
-                `query` will be used.
-            query_pos (Tensor): The positional encoding for `query`.
-                Default: None.
-            key_pos (Tensor): The positional encoding for `key`. Default
-                None.
-            reference_points (Tensor):  The normalized reference
-                points with shape (bs, num_query, num_levels, 2),
-                all elements is range in [0, 1], top-left (0,0),
-                bottom-right (1, 1), including padding area.
-                or (N, Length_{query}, num_levels, 4), add
-                additional two dimensions is (w, h) to
-                form reference boxes.
-            key_padding_mask (Tensor): ByteTensor for `query`, with
-                shape [bs, num_key].
-            spatial_shapes (Tensor): Spatial shape of features in
-                different levels. With shape (num_levels, 2),
-                last dimension represents (h, w).
-            level_start_index (Tensor): The start index of each level.
-                A tensor has shape ``(num_levels, )`` and can be represented
-                as [0, h_0*w_0, h_0*w_0+h_1*w_1, ...].
-
+            query (Tensor): shape (num_query, bs, embed_dims)의 Transformer 쿼리.
+            key (Tensor): shape `(num_key, bs, embed_dims)`의 키 텐서.
+            value (Tensor): shape `(num_key, bs, embed_dims)`의 value 텐서.
+            identity (Tensor): addition에 사용되는 텐서, `query`와 동일한 shape. 기본값 None. None인 경우 `query`가 사용됨.
+            query_pos (Tensor): `query`에 대한 positional encoding. 기본값: None.
+            key_pos (Tensor): `key`에 대한 positional encoding. 기본값: None.
+            reference_points (Tensor): shape (bs, num_query, num_levels, 2)의 정규화된 참조 포인트,
+                                        모든 요소는 [0, 1] 범위 내에 있으며, 좌상단 (0,0), 우하단 (1,1), 패딩 영역 포함.
+                                        또는 (N, Length_{query}, num_levels, 4)의 추가적인 두 차원 (w, h)을 참조 상자로 형성.
+            key_padding_mask (Tensor): shape [bs, num_key]의 `query`에 대한 ByteTensor.
+            spatial_shapes (Tensor): 다양한 레벨에서 특징의 공간 shape. shape (num_levels, 2), 마지막 차원은 (h, w).
+            level_start_index (Tensor): 각 레벨의 시작 인덱스. shape ``(num_levels, )``의 텐서로 [0, h_0*w_0, h_0*w_0+h_1*w_1, ...]로 표현됨.
         Returns:
-             Tensor: forwarded results with shape [num_query, bs, embed_dims].
+             Tensor: shape [num_query, bs, embed_dims]의 forward 결과.
         """
 
         if value is None:
@@ -325,7 +281,7 @@ class CustomMSDeformableAttention(BaseModule):
                 f' 2 or 4, but get {reference_points.shape[-1]} instead.')
         if torch.cuda.is_available() and value.is_cuda:
 
-            # using fp16 deformable attention is unstable because it performs many sum operations
+            # 다중 합산 작업을 수행하기 때문에 fp16 deformable attention 사용은 불안정
             if value.dtype == torch.float16:
                 MultiScaleDeformableAttnFunction = MultiScaleDeformableAttnFunction_fp32
             else:
