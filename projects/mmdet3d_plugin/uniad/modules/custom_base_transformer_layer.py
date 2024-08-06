@@ -56,7 +56,7 @@ class MyCustomBaseTransformerLayer(BaseModule):
                  attn_cfgs=None,
                  ffn_cfgs=dict( #_
                      type='FFN', #_
-                     embed_dims=256, #_
+                     embed_dims=128, #_ 원본: 256 / 수정: 128
                      feedforward_channels=1024, #_
                      num_fcs=2, #_
                      ffn_drop=0., #_

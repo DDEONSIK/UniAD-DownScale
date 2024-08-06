@@ -54,12 +54,12 @@ class PansegformerHead(SegDETRHead):
             thing_transformer_head=dict(
                 type='TransformerHead',  # mask decoder for things # 물체 마스크 디코더
                 d_model=128, #_ 초기값:256 수정log:128 // 모델 차원 수 (입력 임베딩 차원)
-                nhead=4, #_ 초기값:8 수정log:4 // 멀티헤드 어텐션 헤드 수
+                nhead=8, #_ 초기값:8 수정log:4 // 멀티헤드 어텐션 헤드 수
                 num_decoder_layers=4), #_ 초기값:6 수정log:4 // 디코더 레이어 수
             stuff_transformer_head=dict(
                 type='TransformerHead',  # mask decoder for stuff # 영역 마스크 디코더
                 d_model=128, #_ 초기값:256 수정log:128 // 모델 차원 수 (입력 임베딩 차원)
-                nhead=4, #_ 초기값:8 수정log:4 // 멀티헤드 어텐션 헤드 수
+                nhead=8, #_ 초기값:8 수정log:4 // 멀티헤드 어텐션 헤드 수
                 num_decoder_layers=4), #_ 초기값:6 수정log:4 // 디코더 레이어 수
             loss_mask=dict(type='DiceLoss', weight=2.0),
             train_cfg=dict(

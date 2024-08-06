@@ -18,7 +18,7 @@ class PlanningHeadSingleMode(nn.Module):
     def __init__(self,
                  bev_h=200,
                  bev_w=200,
-                 embed_dims=256,
+                 embed_dims=128, #_ 원본: 256 / 수정: 128
                  planning_steps=6,
                  loss_planning=None,
                  loss_collision=None,

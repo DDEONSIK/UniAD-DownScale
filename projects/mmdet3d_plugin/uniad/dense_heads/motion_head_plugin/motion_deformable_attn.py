@@ -60,7 +60,7 @@ class MotionTransformerAttentionLayer(BaseModule):
                  attn_cfgs=None,
                  ffn_cfgs=dict(
                      type='FFN',
-                     embed_dims=256,
+                     embed_dims=128, #_ 원본: 256 / 수정: 128
                      feedforward_channels=1024,
                      num_fcs=2,
                      ffn_drop=0.,
@@ -268,7 +268,7 @@ class MotionDeformableAttention(BaseModule):
     """
 
     def __init__(self,
-                 embed_dims=256,
+                 embed_dims=128, #_ 원본: 256 / 수정: 128
                  num_heads=8,
                  num_levels=4,
                  num_points=4,

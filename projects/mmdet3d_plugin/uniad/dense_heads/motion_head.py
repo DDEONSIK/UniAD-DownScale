@@ -48,7 +48,7 @@ class MotionHead(BaseMotionHead):
                  num_cls_fcs=2,
                  bev_h=30,
                  bev_w=30,
-                 embed_dims=256,
+                 embed_dims=128, #_ 원본: 256 / 수정: 128
                  num_anchor=6,
                  det_layer_num=6,
                  group_id_list=[],

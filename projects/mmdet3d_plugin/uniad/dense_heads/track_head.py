@@ -240,7 +240,7 @@ class BEVFormerTrackHead(DETRHead):
         img_metas=None,
     ):
         assert bev_embed.shape[0] == self.bev_h * self.bev_w  # bev_embed의 첫 번째 차원이 bev_h * bev_w인지 확인 (입력 크기 검증), 
-        print('bev_embed', bev_embed.shape) #torch.Size([40000, 1, 128])
+        # print('bev_embed', bev_embed.shape) #torch.Size([40000, 1, 128])
 
         # Transformer에서 상태와 ref_point을 가져옴
         hs, init_reference, inter_references = self.transformer.get_states_and_refs(
@@ -254,11 +254,11 @@ class BEVFormerTrackHead(DETRHead):
             img_metas=img_metas,
         )
 
-        print('hs_B', hs.shape) #torch.Size([4, 901, 1, 128])
+        # print('hs_B', hs.shape) #torch.Size([4, 901, 1, 128])
         #(num_layers, num_queries, batch_size, embed_dim)
 
         hs = hs.permute(0, 2, 1, 3)  # 차원 순서 변경. 형태 변환
-        print('hs_A', hs.shape) #torch.Size([4, 1, 901, 128])
+        # print('hs_A', hs.shape) #torch.Size([4, 1, 901, 128])
         #(num_layers, batch_size, num_queries, embed_dim)
 
         outputs_classes = []  # 클래스 예측 결과를 저장할 리스트 초기화
@@ -268,30 +268,30 @@ class BEVFormerTrackHead(DETRHead):
         for lvl in range(hs.shape[0]):  # 각 레이어에 대해 반복
             if lvl == 0:
                 reference = ref_points.sigmoid()  # 첫 번째 레이어에서는 ref_point을 sigmoid로 변환
-                print('reference_1', reference.shape) #reference_1 torch.Size([901, 3]) #(num_q, dim)
+                # print('reference_1', reference.shape) #reference_1 torch.Size([901, 3]) #(num_q, dim)
             else:
                 reference = inter_references[lvl - 1]  # 그 외의 레이어에서는 이전 레이어의 ref_point 사용
-                print('reference_2', reference.shape)
+                # print('reference_2', reference.shape)
             reference = inverse_sigmoid(reference)  # ref_point을 inverse_sigmoid로 변환
-            print('reference_3', reference.shape)
+            # print('reference_3', reference.shape)
 
             outputs_class = self.cls_branches[lvl](hs[lvl])  # 현재 레이어의 클래스 예측 계산
-            print('outputs_class', outputs_class.shape) #outputs_class torch.Size([1, 901, 10]) 
+            # print('outputs_class', outputs_class.shape) #outputs_class torch.Size([1, 901, 10]) 
             #(bs, num_q, num_class)
 
             tmp = self.reg_branches[lvl](hs[lvl])  # 현재 레이어의 좌표 예측 계산
-            print('tmp', tmp.shape) #tmp torch.Size([1, 901, 10]) 
+            # print('tmp', tmp.shape) #tmp torch.Size([1, 901, 10]) 
             #(bs, num_q, num_coords)
 
             # 궤적 예측 계산
             outputs_past_traj = self.past_traj_reg_branches[lvl](hs[lvl]).view(
                 tmp.shape[0], -1, self.past_steps + self.fut_steps, 2)
-            print('outputs_past_traj', outputs_past_traj.shape) #outputs_past_traj torch.Size([1, 901, 8, 2]) 
+            # print('outputs_past_traj', outputs_past_traj.shape) #outputs_past_traj torch.Size([1, 901, 8, 2]) 
             #(bs, num_q, len_traj(past_steps + fut_steps), 2D_traj_point)
             
             # TODO: check the shape of reference
             assert reference.shape[-1] == 3  # ref_point의 마지막 차원이 3인지 확인 (검증)
-            print('reference_lastDim', reference.shape) #reference_lastDim torch.Size([901, 3])
+            # print('reference_lastDim', reference.shape) #reference_lastDim torch.Size([901, 3])
 
             tmp[..., 0:2] += reference[..., 0:2]  # ref_point의 x, y 좌표를 예측값에 더함
             tmp[..., 0:2] = tmp[..., 0:2].sigmoid()  # x, y 좌표에 sigmoid 적용
@@ -301,7 +301,7 @@ class BEVFormerTrackHead(DETRHead):
             last_ref_points = torch.cat(  # 마지막 ref_point 계산
                 [tmp[..., 0:2], tmp[..., 4:5]], dim=-1,
             )
-            print('last_ref_points_lastDim', last_ref_points.shape) #last_ref_points_lastDim torch.Size([1, 901, 3])
+            # print('last_ref_points_lastDim', last_ref_points.shape) #last_ref_points_lastDim torch.Size([1, 901, 3])
 
             tmp[..., 0:1] = (tmp[..., 0:1] * (self.pc_range[3] - self.pc_range[0]) + self.pc_range[0])  # x 좌표 변환
             tmp[..., 1:2] = (tmp[..., 1:2] * (self.pc_range[4] - self.pc_range[1]) + self.pc_range[1])  # y 좌표 변환
@@ -318,19 +318,19 @@ class BEVFormerTrackHead(DETRHead):
             outputs_trajs.append(outputs_past_traj)  # 궤적 예측 결과를 리스트에 추가
 
         outputs_classes = torch.stack(outputs_classes)  # 클래스 예측 결과를 텐서로 변환
-        print('outputs_class_result', outputs_class.shape) #outputs_class_result torch.Size([1, 901, 10]) 
+        # print('outputs_class_result', outputs_class.shape) #outputs_class_result torch.Size([1, 901, 10]) 
         #(bs, num_q, num_class)
 
         outputs_coords = torch.stack(outputs_coords)    # 좌표 예측 결과를 텐서로 변환
-        print('outputs_coords_result', outputs_coords.shape) #outputs_coords_result torch.Size([4, 1, 901, 10]) 
+        # print('outputs_coords_result', outputs_coords.shape) #outputs_coords_result torch.Size([4, 1, 901, 10]) 
         #(num_layers, bs, num_queries, num_coords)
 
         outputs_trajs = torch.stack(outputs_trajs)      # 궤적 예측 결과를 텐서로 변환
-        print('outputs_trajs_result', outputs_trajs.shape) #outputs_trajs_result torch.Size([4, 1, 901, 8, 2])
+        # print('outputs_trajs_result', outputs_trajs.shape) #outputs_trajs_result torch.Size([4, 1, 901, 8, 2])
         #(num_layers, bs, num_queries, len_traj, 2D_traj_point)
 
         last_ref_points = inverse_sigmoid(last_ref_points)  # 마지막 ref_point에 inverse_sigmoid 적용
-        print('last_ref_points_result', last_ref_points.shape) #last_ref_points_result torch.Size([1, 901, 3])
+        # print('last_ref_points_result', last_ref_points.shape) #last_ref_points_result torch.Size([1, 901, 3])
         #(batch_size, num_queries, dim_ref_points)
 
         # 결과를 딕셔너리로 저장
@@ -407,28 +407,28 @@ class BEVFormerTrackHead(DETRHead):
         #######################################################################
 
         # object query 시각화   -- 수정중
-        print("object_query_embeds:", object_query_embeds.shape) # torch.Size([901, 256])
+        # print("object_query_embeds:", object_query_embeds.shape) # torch.Size([901, 256])
 
 
 
-        attention_map = hs[0, 0, :, :].cpu().detach().numpy()  # 첫 레이어, 첫 배치, 모든 쿼리, 모든 임베딩
-        print('attention_map_before_reshape', attention_map.shape)
+        # attention_map = hs[0, 0, :, :].cpu().detach().numpy()  # 첫 레이어, 첫 배치, 모든 쿼리, 모든 임베딩
+        # print('attention_map_before_reshape', attention_map.shape)
 
-        # attention_map의 크기를 (bev_h * bev_w, embed_dim)으로 reshape 할 수 없으므로 아래와 같이 처리
-        if attention_map.shape[0] == self.bev_h * self.bev_w:
-            attention_map = attention_map.reshape(self.bev_h, self.bev_w, -1)[:, :, 0]  # 주어진 형태로 재구성 후 첫 번째 임베딩 차원 사용
-        else:
-            # attention_map의 크기를 출력하여 확인
-            print("Attention map size does not match bev_h * bev_w, skipping reshape")
+        # # attention_map의 크기를 (bev_h * bev_w, embed_dim)으로 reshape 할 수 없으므로 아래와 같이 처리
+        # if attention_map.shape[0] == self.bev_h * self.bev_w:
+        #     attention_map = attention_map.reshape(self.bev_h, self.bev_w, -1)[:, :, 0]  # 주어진 형태로 재구성 후 첫 번째 임베딩 차원 사용
+        # else:
+        #     # attention_map의 크기를 출력하여 확인
+        #     print("Attention map size does not match bev_h * bev_w, skipping reshape")
 
-        plt.figure(figsize=(10, 10))
-        plt.imshow(attention_map, cmap='viridis', interpolation='nearest')
-        plt.colorbar()
-        plt.title('object query')
-        plt.xlabel('BEV Width')
-        plt.ylabel('BEV Height')
-        plt.savefig('/home/hyun/local_storage/code/UniAD/projects/mmdet3d_plugin/uniad/dense_heads/track_head-TrackFormer_Visualization/get_detections/attention_heatmap.png')
-        plt.close()
+        # plt.figure(figsize=(10, 10))
+        # plt.imshow(attention_map, cmap='viridis', interpolation='nearest')
+        # plt.colorbar()
+        # plt.title('object query')
+        # plt.xlabel('BEV Width')
+        # plt.ylabel('BEV Height')
+        # plt.savefig('/home/hyun/local_storage/code/UniAD/projects/mmdet3d_plugin/uniad/dense_heads/track_head-TrackFormer_Visualization/get_detections/attention_heatmap.png')
+        # plt.close()
 
         #######################################################################
         #######################################################################

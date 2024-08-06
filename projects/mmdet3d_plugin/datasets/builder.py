@@ -86,7 +86,7 @@ def build_dataloader(dataset,
         sampler=sampler,
         num_workers=num_workers,
         collate_fn=partial(collate, samples_per_gpu=samples_per_gpu),
-        pin_memory=False,
+        pin_memory= True, # 기본 값: False, # pin_memory=True로 설정하면 데이터가 CUDA 메모리로 전송될 때 더 빠르게 전송될 수 있음.
         worker_init_fn=init_fn,
         **kwargs)
 

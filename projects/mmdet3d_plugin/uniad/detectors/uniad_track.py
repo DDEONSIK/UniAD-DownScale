@@ -62,7 +62,7 @@ class UniADTrack(MVXTwoStageDetector):
             iou_thres=0.3,
         ),
         pc_range=None,
-        embed_dims=128, #_256
+        embed_dims=128, #_ 원본: 256 / 수정: 128
         num_query=900, #_500
         num_classes=10,
         vehicle_id_list=None,

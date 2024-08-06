@@ -159,7 +159,7 @@ class CustomMSDeformableAttention(BaseModule):
 
     def __init__(self,
                  embed_dims=128, #_ 초기값: 256 수정log:128 // Transformer의 임베딩 차원 크기, 모델이 입력 데이터에서 학습하는 특징 벡터의 크기
-                 num_heads=4, #_ 초기값:8 수정log:4 // 멀티헤드 어텐션 헤드 수
+                 num_heads=8, #_ 초기값:8 수정log:4 // 멀티헤드 어텐션 헤드 수
                                 #6으로 하면 embed_dim와 나뉘었을 때 떨어지지 않음
                  num_levels=4,
                  num_points=4,

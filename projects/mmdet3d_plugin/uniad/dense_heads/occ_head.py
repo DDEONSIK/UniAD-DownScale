@@ -32,12 +32,12 @@ class OccHead(BaseModule):
                  grid_conf = None,
 
                  bev_size=(200, 200),
-                 bev_emb_dim=256,
+                 bev_emb_dim=128, #_ 원본: 256 / 수정: 128
                  bev_proj_dim=64,
                  bev_proj_nlayers=1,
 
                  # Query
-                 query_dim=256,
+                 query_dim=128, #_ 원본: 256 / 수정: 128
                  query_mlp_layers=3,
                  detach_query_pos=True,
                  temporal_mlp_layer=2,

@@ -29,7 +29,7 @@ group_id_list = [[0,1,2,3,4], [6,7], [8], [5,9]]
 input_modality = dict(
     use_lidar=False, use_camera=True, use_radar=False, use_map=False, use_external=True
 )
-_dim_ = 256
+_dim_ = 128 #_ 원본: 256 / 수정: 128
 _pos_dim_ = _dim_ // 2
 _ffn_dim_ = _dim_ * 2
 _num_levels_ = 4
@@ -38,7 +38,7 @@ bev_w_ = 200
 _feed_dim_ = _ffn_dim_
 _dim_half_ = _pos_dim_
 canvas_size = (bev_h_, bev_w_)
-queue_length = 3  # each sequence contains `queue_length` frames.
+queue_length = 5 # 3 -> 5  # each sequence contains `queue_length` frames.
 
 ### traj prediction args ###
 predict_steps = 12
@@ -153,7 +153,7 @@ model = dict(
             embed_dims=_dim_,
             encoder=dict(
                 type="BEVFormerEncoder",
-                num_layers=6,
+                num_layers=6, #_ 원본: 6 / 수정: 4
                 pc_range=point_cloud_range,
                 num_points_in_pillar=4,
                 return_intermediate=False,
@@ -175,6 +175,16 @@ model = dict(
                             embed_dims=_dim_,
                         ),
                     ],
+
+                    ffn_cfgs=dict( #+
+                        type='FFN', #+
+                        embed_dims=_dim_, #+
+                        feedforward_channels=2048, #+
+                        num_fcs=2, #+
+                        ffn_drop=0., #+
+                        act_cfg=dict(type='ReLU', inplace=True), #+
+                    ), #+
+                    
                     feedforward_channels=_ffn_dim_,
                     ffn_dropout=0.1,
                     operation_order=(
@@ -189,7 +199,7 @@ model = dict(
             ),
             decoder=dict(
                 type="DetectionTransformerDecoder",
-                num_layers=6,
+                num_layers=6, #_ 원본: 6 / 수정: 4
                 return_intermediate=True,
                 transformerlayers=dict(
                     type="DetrTransformerDecoderLayer",
@@ -197,7 +207,7 @@ model = dict(
                         dict(
                             type="MultiheadAttention",
                             embed_dims=_dim_,
-                            num_heads=8,
+                            num_heads=8, #_ 원본: 8 / 수정: 4
                             dropout=0.1,
                         ),
                         dict(
@@ -206,6 +216,16 @@ model = dict(
                             num_levels=1,
                         ),
                     ],
+
+                    ffn_cfgs=dict( #+
+                        type='FFN', #+
+                        embed_dims=_dim_, #+
+                        feedforward_channels=2048, #+
+                        num_fcs=2, #+
+                        ffn_drop=0., #+
+                        act_cfg=dict(type='ReLU', inplace=True), #+
+                    ), #+
+                    
                     feedforward_channels=_ffn_dim_,
                     ffn_dropout=0.1,
                     operation_order=(
@@ -249,7 +269,7 @@ model = dict(
         num_classes=4,
         num_things_classes=3,
         num_stuff_classes=1,
-        in_channels=2048,
+        in_channels=2048, # change to 512 #_ 원본: 2048 / 수정: 1024
         sync_cls_avg_factor=True,
         as_two_stage=False,
         with_box_refine=True,
@@ -257,7 +277,7 @@ model = dict(
             type='SegDeformableTransformer',
             encoder=dict(
                 type='DetrTransformerEncoder',
-                num_layers=6,
+                num_layers=6, #_ 원본: 6 / 수정: 4
                 transformerlayers=dict(
                     type='BaseTransformerLayer',
                     attn_cfgs=dict(
@@ -265,12 +285,23 @@ model = dict(
                         embed_dims=_dim_,
                         num_levels=_num_levels_,
                          ),
+
+                    ffn_cfgs=dict( #+
+                        type='FFN', #+
+                        embed_dims=_dim_, #+
+                        feedforward_channels=1024, #+
+                        num_fcs=2, #+
+                        ffn_drop=0., #+
+                        act_cfg=dict(type='ReLU', inplace=True), #+
+                    ), #+
+
+
                     feedforward_channels=_feed_dim_,
                     ffn_dropout=0.1,
                     operation_order=('self_attn', 'norm', 'ffn', 'norm'))),
             decoder=dict(
                 type='DeformableDetrTransformerDecoder',
-                num_layers=6,
+                num_layers=6, #_ 원본: 6 / 수정: 4
                 return_intermediate=True,
                 transformerlayers=dict(
                     type='DetrTransformerDecoderLayer',
@@ -278,7 +309,7 @@ model = dict(
                         dict(
                             type='MultiheadAttention',
                             embed_dims=_dim_,
-                            num_heads=8,
+                            num_heads=8, #_ 원본: 8 / 수정: 4
                             dropout=0.1),
                         dict(
                             type='MultiScaleDeformableAttention',
@@ -286,6 +317,16 @@ model = dict(
                             num_levels=_num_levels_,
                         )
                     ],
+
+                    ffn_cfgs=dict( #+
+                        type='FFN', #+
+                        embed_dims=_dim_, #+
+                        feedforward_channels=2048, #+
+                        num_fcs=2, #+
+                        ffn_drop=0., #+
+                        act_cfg=dict(type='ReLU', inplace=True), #+
+                    ), #+
+
                     feedforward_channels=_feed_dim_,
                     ffn_dropout=0.1,
                     operation_order=('self_attn', 'norm', 'cross_attn', 'norm',
@@ -333,7 +374,7 @@ model = dict(
         grid_conf=occflow_grid_conf,
         ignore_index=255,
 
-        bev_proj_dim=256,
+        bev_proj_dim=128, #_ 원본: 256 / 수정: 128
         bev_proj_nlayers=4,
 
         # Transformer
@@ -346,26 +387,26 @@ model = dict(
                 type='DetrTransformerDecoderLayer',
                 attn_cfgs=dict(
                     type='MultiheadAttention',
-                    embed_dims=256,
-                    num_heads=8,
+                    embed_dims=128, #_ 원본: 256 / 수정: 128
+                    num_heads=8, #_ 원본: 8 / 수정: 4
                     attn_drop=0.0,
                     proj_drop=0.0,
                     dropout_layer=None,
                     batch_first=False),
                 ffn_cfgs=dict(
-                    embed_dims=256,
-                    feedforward_channels=2048,  # change to 512
+                    embed_dims=128, #_ 원본: 256 / 수정: 128
+                    feedforward_channels=2048,  # change to 512 #_ 원본: 2048 / 수정: 1024
                     num_fcs=2,
                     act_cfg=dict(type='ReLU', inplace=True),
                     ffn_drop=0.0,
                     dropout_layer=None,
                     add_identity=True),
-                feedforward_channels=2048,
+                feedforward_channels=2048, #_ 원본: 2048 / 수정: 1024
                 operation_order=('self_attn', 'norm', 'cross_attn', 'norm',
                                  'ffn', 'norm')),
             init_cfg=None),
         # Query
-        query_dim=256,
+        query_dim=128, #_ 원본: 256 / 수정: 128 
         query_mlp_layers=3,
 
         aux_loss_weight=1.,
@@ -427,10 +468,19 @@ model = dict(
                         num_steps=predict_steps,
                         embed_dims=_dim_,
                         num_levels=1,
-                        num_heads=8,
+                        num_heads=8, #_ 원본: 8 / 수정: 4
                         num_points=4,
                         sample_index=-1),
                 ],
+
+                ffn_cfgs=dict( #+
+                        type='FFN', #+
+                        embed_dims=_dim_, #+
+                        feedforward_channels=2048, #+
+                        num_fcs=2, #+
+                        ffn_drop=0., #+
+                        act_cfg=dict(type='ReLU', inplace=True), #+
+                    ), #+
 
                 feedforward_channels=_ffn_dim_,
                 ffn_dropout=0.1,
@@ -439,7 +489,7 @@ model = dict(
     ),
     planning_head=dict(
         type='PlanningHeadSingleMode',
-        embed_dims=256,
+        embed_dims=128, #_ 원본: 256 / 수정: 128
         planning_steps=planning_steps,
         loss_planning=dict(type='PlanningLoss'),
         loss_collision=[dict(type='CollisionLoss', delta=0.0, weight=2.5),
@@ -452,7 +502,7 @@ model = dict(
     # model training and testing settings
     train_cfg=dict(
         pts=dict(
-            grid_size=[512, 512, 1],
+            grid_size=[256, 256, 1], #_ 원본: 512 / 수정: 256
             voxel_size=voxel_size,
             point_cloud_range=point_cloud_range,
             out_size_factor=4,
@@ -667,7 +717,7 @@ data = dict(
 )
 optimizer = dict(
     type="AdamW",
-    lr=2e-4,
+    lr=2e-4, #원본: 2e-4 / 수정: 1e-4  # 사이즈 축소에 대한 학습률 낮춤
     paramwise_cfg=dict(
         custom_keys={
             "img_backbone": dict(lr_mult=0.1),
@@ -684,13 +734,17 @@ lr_config = dict(
     warmup_ratio=1.0 / 3,
     min_lr_ratio=1e-3,
 )
-total_epochs = 20
+total_epochs = 24 #원본: 24 / 수정: 20  # 사이즈 축소에 대한, 학습률 낮춤에 대한 에폭수 증가
 evaluation = dict(interval=4, pipeline=test_pipeline)
 runner = dict(type="EpochBasedRunner", max_epochs=total_epochs)
 log_config = dict(
     interval=10, hooks=[dict(type="TextLoggerHook"), dict(type="TensorboardLoggerHook")]
 )
 checkpoint_config = dict(interval=1)
-load_from = "ckpts/uniad_base_track_map.pth"
+load_from = "/home/hyun/local_storage/code/UniAD/ckpts/uniad_base_track_map.pth"
+# --> 사전 학습된 모델과의 불일치: load_from에 지정된 사전 학습된 모델은 원래 구조에 맞춰져 있을 텐데, 변경된 구조와 맞지 않을 수 있음.
+
+# resume_from = "/UniAD/projects/work_dirs/stage1_track_map/base_track_map/latest.pth" 
+#             #_ 마지막 학습 log 불러옴   #e2e는 경로 수정 필요
 
 find_unused_parameters = True

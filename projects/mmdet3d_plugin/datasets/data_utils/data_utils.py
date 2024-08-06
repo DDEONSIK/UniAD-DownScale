@@ -136,7 +136,7 @@ def obtain_map_info(nusc,
                     nusc_maps,
                     sample,
                     patch_size=(102.4, 102.4),
-                    canvas_size=(256, 256),
+                    canvas_size=(256, 256), # 입력 이미지 또는 출력 이미지의 크기를 지정
                     layer_names=['lane_divider', 'road_divider'],
                     thickness=10):
     """

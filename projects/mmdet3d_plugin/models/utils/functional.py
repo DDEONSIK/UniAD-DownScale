@@ -38,7 +38,7 @@ def norm_points(pos, pc_range):
     y_norm = (pos[..., 1] - pc_range[1]) / (pc_range[4] - pc_range[1]) 
     return torch.stack([x_norm, y_norm], dim=-1)
 
-def pos2posemb2d(pos, num_pos_feats=128, temperature=10000):
+def pos2posemb2d(pos, num_pos_feats=64, temperature=10000): # 원본: num_pos_feats=128 / 수정: num_pos_feats=64
     """
     Convert 2D position into positional embeddings.
 

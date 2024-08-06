@@ -56,7 +56,7 @@ class SpatialCrossAttention(BaseModule): #BaseModule: 상속받을 부모 클래
     """
 
     def __init__(self,
-                 embed_dims=256,
+                 embed_dims=128, #_ 원본: 256 / 수정: 128
                  num_cams=6,
                  pc_range=None,
                  dropout=0.1,
@@ -64,7 +64,7 @@ class SpatialCrossAttention(BaseModule): #BaseModule: 상속받을 부모 클래
                  batch_first=False,
                  deformable_attention=dict(
                      type='MSDeformableAttention3D',
-                     embed_dims=256,
+                     embed_dims=128, #_ 원본: 256 / 수정: 128
                      num_levels=4),
                  **kwargs
                  ):
@@ -248,7 +248,7 @@ class MSDeformableAttention3D(BaseModule):
     """
 
     def __init__(self,
-                 embed_dims=256, #_
+                 embed_dims=128, #_ 원본: 256 / 수정: 128
                  num_heads=8, #_
                  num_levels=4,
                  num_points=8,

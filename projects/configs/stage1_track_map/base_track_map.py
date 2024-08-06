@@ -102,8 +102,12 @@ model = dict(
     ),
     img_neck=dict(
         type="FPN",
-        in_channels=[512, 1024, 2048],
+        in_channels=[512, 1024, 2048], #_ 원본: 512, 1024, 2048 / 수정: 256, 512, 1024  #256 -> 128
         out_channels=_dim_,
+
+        # RuntimeError: Given groups=1, weight of size [128, 256, 1, 1], 
+        # expected input[6, 512, 116, 200] to have 256 channels, but got 512 channels instead
+
         start_level=0,
         add_extra_convs="on_output",
         num_outs=4,
@@ -163,7 +167,7 @@ model = dict(
             embed_dims=_dim_,
             encoder=dict(
                 type="BEVFormerEncoder",
-                num_layers=4, #_ 초기값:6 // BEVFormerEncoder 인코더의 레이어(층) 수
+                num_layers=6, #_ 초기값:6 // BEVFormerEncoder 인코더의 레이어(층) 수
                 pc_range=point_cloud_range,
                 num_points_in_pillar=4,
                 return_intermediate=False,
@@ -222,7 +226,7 @@ model = dict(
             ),
             decoder=dict(
                 type="DetectionTransformerDecoder",
-                num_layers=4, #_ 초기값:6 // DetectionTransformerDecoder 디코더의 레이어(층) 수
+                num_layers=6, #_ 초기값:6 // DetectionTransformerDecoder 디코더의 레이어(층) 수
                 return_intermediate=True,
                 transformerlayers=dict(
                     type="DetrTransformerDecoderLayer",
@@ -230,7 +234,7 @@ model = dict(
                         dict(
                             type="MultiheadAttention",
                             embed_dims=_dim_,
-                            num_heads=4, #_ 초기값:8 수정log:4 // PansegformerHead nhead=4와 맞춤 - 멀티헤드 어텐션 헤드 수
+                            num_heads=8, #_ 초기값:8 수정log:4 // PansegformerHead nhead=4와 맞춤 - 멀티헤드 어텐션 헤드 수
                                             #6으로 하면 embed_dim와 나뉘었을 때 떨어지지 않음
                             dropout=0.1,
                         ),
@@ -299,7 +303,7 @@ model = dict(
             type='SegDeformableTransformer',
             encoder=dict(
                 type='DetrTransformerEncoder',
-                num_layers=4, #_ 초기값:6 // DetrTransformerEncoder 인코더의 레이어(층) 수
+                num_layers=6, #_ 초기값:6 // DetrTransformerEncoder 인코더의 레이어(층) 수
                 transformerlayers=dict(
                     type='BaseTransformerLayer',
                     attn_cfgs=dict(
@@ -320,7 +324,7 @@ model = dict(
                     operation_order=('self_attn', 'norm', 'ffn', 'norm'))),
             decoder=dict(
                 type='DeformableDetrTransformerDecoder',
-                num_layers=4, #_ 초기값:6 // DetrTransformerEncoder 인코더의 레이어(층) 수
+                num_layers=6, #_ 초기값:6 // DetrTransformerEncoder 인코더의 레이어(층) 수
                 return_intermediate=True,
                 transformerlayers=dict(
                     type='DetrTransformerDecoderLayer',
@@ -328,7 +332,7 @@ model = dict(
                         dict(
                             type='MultiheadAttention',
                             embed_dims=_dim_,
-                            num_heads=4, #_ 초기값:8 수정log:4 // 멀티헤드 어텐션 헤드 수
+                            num_heads=8, #_ 초기값:8 수정log:4 // 멀티헤드 어텐션 헤드 수
                                             #6으로 하면 embed_dim와 나뉘었을 때 떨어지지 않음
                             dropout=0.1),
                         dict(

@@ -25,7 +25,7 @@ class MotionTransformerDecoder(BaseModule):
             `LN`.
     """
 
-    def __init__(self, pc_range=None, embed_dims=256, transformerlayers=None, num_layers=3, **kwargs):
+    def __init__(self, pc_range=None, embed_dims=128, transformerlayers=None, num_layers=3, **kwargs):  #_ 원본: embed_dims=256, / 수정: 128
         super(MotionTransformerDecoder, self).__init__()
         self.pc_range = pc_range
         self.embed_dims = embed_dims
@@ -177,7 +177,7 @@ class TrackAgentInteraction(BaseModule):
     Modeling the interaction between the agents
     """
     def __init__(self,
-                 embed_dims=256,
+                 embed_dims=128, #_ 원본: 256 / 수정: 128
                  num_heads=8,
                  dropout=0.1,
                  batch_first=True,
@@ -217,7 +217,7 @@ class MapInteraction(BaseModule):
     Modeling the interaction between the agent and the map
     """
     def __init__(self,
-                 embed_dims=256,
+                 embed_dims=128, #_ 원본: 256 / 수정: 128
                  num_heads=8,
                  dropout=0.1,
                  batch_first=True,
@@ -256,7 +256,7 @@ class IntentionInteraction(BaseModule):
     Modeling the interaction between anchors
     """
     def __init__(self,
-                 embed_dims=256,
+                 embed_dims=128, #_ 원본: 256 / 수정: 128
                  num_heads=8,
                  dropout=0.1,
                  batch_first=True,
