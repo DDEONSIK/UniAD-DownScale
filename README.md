@@ -29,7 +29,7 @@
 ## Torch install - cudatoolkit=11.3 / Torch=1.10.1 
 - conda install pytorch==1.10.1 torchvision==0.11.2 torchaudio==0.10.1 cudatoolkit=11.3 -c pytorch -c conda-forge -y #설치
 - conda list cudatoolkit -f #확인 11.3.1
-- python -c "import torch; print(torch.__version__)" #확인 1.10.1
+- python -c "import torch; print(torch.__version __)" #확인 1.10.1
 
 - export PATH=/usr/local/cuda-11.3/bin:$PATH #경로지정
 
