@@ -111,7 +111,7 @@ class PansegformerHead(SegDETRHead):
                     iou_cost=dict(type='IoUCost', iou_mode='giou', weight=2.0),
                     max_pos=
                     1  # Depends on GPU memory, setting it to 1, model can be trained on 1080Ti 
-                    #_ 초기값:3 수정log:1
+                    # 초기값:3 수정log:1
                 ), )
 
         self.loss_mask = build_loss(loss_mask)

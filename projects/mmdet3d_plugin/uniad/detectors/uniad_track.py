@@ -26,32 +26,31 @@ from ..dense_heads.track_head_plugin import MemoryBank, QueryInteractionModule, 
 @DETECTORS.register_module()
 # @DETECTORS.register_module(force=True) # 기존 항목 덮어쓰기 #디버깅
 class UniADTrack(MVXTwoStageDetector):
-    """UniAD tracking part
-    """
+    """UniAD 추적 부분"""
     def __init__(
         self, 
-        use_grid_mask=False,
-        img_backbone=None,
-        img_neck=None,
-        pts_bbox_head=None,
-        train_cfg=None,
-        test_cfg=None,
-        pretrained=None,
-        video_test_mode=False,
-        loss_cfg=None,
-        qim_args=dict(
+        use_grid_mask=False,  # 그리드 마스크 사용 여부
+        img_backbone=None,  # 이미지 백본 네트워크
+        img_neck=None,  # 이미지 넥 네트워크
+        pts_bbox_head=None,  # 포인트 바운딩 박스 헤드
+        train_cfg=None,  # 학습 설정
+        test_cfg=None,  # 테스트 설정
+        pretrained=None,  # 사전 학습된 모델
+        video_test_mode=False,  # 비디오 테스트 모드
+        loss_cfg=None,  # 손실 함수 설정
+        qim_args=dict(  # QIM 설정
             qim_type="QIMBase",
             merger_dropout=0,
             update_query_pos=False,
             fp_ratio=0.3,
             random_drop=0.1,
         ),
-        mem_args=dict(
+        mem_args=dict(  # 메모리 뱅크 설정
             memory_bank_type="MemoryBank",
             memory_bank_score_thresh=0.0,
             memory_bank_len=4,
         ),
-        bbox_coder=dict(
+        bbox_coder=dict(  # 바운딩 박스 코더 설정
             type="DETRTrack3DCoder",
             post_center_range=[-61.2, -61.2, -10.0, 61.2, 61.2, 10.0],
             pc_range=[-51.2, -51.2, -5.0, 51.2, 51.2, 3.0],
@@ -61,20 +60,20 @@ class UniADTrack(MVXTwoStageDetector):
             with_nms=False,
             iou_thres=0.3,
         ),
-        pc_range=None,
-        embed_dims=128, #_ 원본: 256 / 수정: 128
-        num_query=900, #_500
-        num_classes=10,
-        vehicle_id_list=None,
-        score_thresh=0.2,
-        filter_score_thresh=0.1,
-        miss_tolerance=5,
-        gt_iou_threshold=0.0,
-        freeze_img_backbone=False,
-        freeze_img_neck=False,
-        freeze_bn=False,
-        freeze_bev_encoder=False,
-        queue_length=3,
+        pc_range=None,  # 포인트 클라우드 범위
+        embed_dims=128,  # 임베딩 차원 수 #_ 원본: 256 / 수정: 128
+        num_query=900,  # 쿼리 수 #_500
+        num_classes=10,  # 클래스 수
+        vehicle_id_list=None,  # 차량 ID 리스트
+        score_thresh=0.2,  # 점수 임계값
+        filter_score_thresh=0.1,  # 필터 점수 임계값
+        miss_tolerance=5,  # 미스 허용 범위
+        gt_iou_threshold=0.0,  # GT IOU 임계값
+        freeze_img_backbone=False,  # 이미지 백본 고정 여부
+        freeze_img_neck=False,  # 이미지 넥 고정 여부
+        freeze_bn=False,  # 배치 정규화 고정 여부
+        freeze_bev_encoder=False,  # BEV 인코더 고정 여부
+        queue_length=3,  # 큐 길이
     ):
         super(UniADTrack, self).__init__(
             img_backbone=img_backbone,
@@ -85,6 +84,7 @@ class UniADTrack(MVXTwoStageDetector):
             pretrained=pretrained,
         )
 
+        # 그리드 마스크 설정
         self.grid_mask = GridMask(
             True, True, rotate=1, offset=False, ratio=0.5, mode=1, prob=0.7
         )
@@ -155,7 +155,7 @@ class UniADTrack(MVXTwoStageDetector):
         self.freeze_bev_encoder = freeze_bev_encoder
 
     def extract_img_feat(self, img, len_queue=None):
-        """Extract features of images."""
+        """이미지 특징 추출"""
         if img is None:
             return None
         assert img.dim() == 5
@@ -186,7 +186,7 @@ class UniADTrack(MVXTwoStageDetector):
         query = self.query_embedding.weight
         track_instances.ref_pts = self.reference_points(query[..., : dim // 2])
 
-        # init boxes: xy, wl, z, h, sin, cos, vx, vy, vz
+        # 초기 박스: xy, wl, z, h, sin, cos, vx, vy, vz
         pred_boxes_init = torch.zeros(
             (len(track_instances), 10), dtype=torch.float, device=device
         )
@@ -337,7 +337,7 @@ class UniADTrack(MVXTwoStageDetector):
         self.train()
         return prev_bev
 
-    # Generate bev using bev_encoder in BEVFormer
+    # BEV 인코더를 사용하여 BEV 생성
     def get_bevs(self, imgs, img_metas, prev_img=None, prev_img_metas=None, prev_bev=None):
         if prev_img is not None and prev_img_metas is not None:
             assert prev_bev is None
@@ -377,15 +377,14 @@ class UniADTrack(MVXTwoStageDetector):
         all_instances_pred_boxes=None,
     ):
         """
-        Perform forward only on one frame. Called in  forward_train
-        Warnning: Only Support BS=1
+        하나의 프레임에 대해 forward 수행. forward_train에서 호출됨
+        경고: BS=1만 지원함
         Args:
             img: shape [B, num_cam, 3, H, W]
-            if l2g_r2 is None or l2g_t2 is None:
-                it means this frame is the end of the training clip,
-                so no need to call velocity update
+            l2g_r2 또는 l2g_t2가 None인 경우:
+                이는 이 프레임이 학습 클립의 끝을 의미하므로 속도 업데이트를 호출할 필요 없음
         """
-        # NOTE: You can replace BEVFormer with other BEV encoder and provide bev_embed here
+        # 주의: 여기서 BEVFormer를 다른 BEV 인코더로 교체하고 bev_embed를 제공할 수 있음
         bev_embed, bev_pos = self.get_bevs(
             img, img_metas,
             prev_img=prev_img, prev_img_metas=prev_img_metas,
@@ -415,18 +414,18 @@ class UniADTrack(MVXTwoStageDetector):
         with torch.no_grad():
             track_scores = output_classes[-1, 0, :].sigmoid().max(dim=-1).values
 
-        # Step-1 Update track instances with current prediction
+        # Step-1 현재 예측을 사용하여 트랙 인스턴스 업데이트
         # [nb_dec, bs, num_query, xxx]
         nb_dec = output_classes.size(0)
 
-        # the track id will be assigned by the matcher.
+        # 트랙 ID는 매처에 의해 할당됨
         track_instances_list = [
             self._copy_tracks_for_loss(track_instances) for i in range(nb_dec - 1)
         ]
         track_instances.output_embedding = query_feats[-1][0]  # [300, feat_dim]
         velo = output_coords[-1, 0, :, -2:]  # [num_query, 3]
         if l2g_r2 is not None:
-            # Update ref_pts for next frame considering each agent's velocity
+            # 각 에이전트의 속도를 고려하여 다음 프레임에 대한 ref_pts 업데이트
             ref_pts = self.velo_update(
                 last_ref_pts[0],
                 velo,
@@ -460,16 +459,16 @@ class UniADTrack(MVXTwoStageDetector):
             all_query_embeddings.append(query_feats[i][0])
             all_matched_indices.append(matched_indices)
             all_instances_pred_logits.append(output_classes[i, 0])
-            all_instances_pred_boxes.append(output_coords[i, 0])   # Not used
+            all_instances_pred_boxes.append(output_coords[i, 0])   # 사용되지 않음
         
         active_index = (track_instances.obj_idxes>=0) & (track_instances.iou >= self.gt_iou_threshold) & (track_instances.matched_gt_idxes >=0)
         out.update(self.select_active_track_query(track_instances, active_index, img_metas))
         out.update(self.select_sdc_track_query(track_instances[900], img_metas)) #_500
         
-        # memory bank 
+        # 메모리 뱅크
         if self.memory_bank is not None:
             track_instances = self.memory_bank(track_instances)
-        # Step-2 Update track instances using matcher
+        # Step-2 매처를 사용하여 트랙 인스턴스 업데이트
 
         tmp = {}
         tmp["init_track_instances"] = self._generate_empty_tracks()
@@ -514,13 +513,13 @@ class UniADTrack(MVXTwoStageDetector):
         """
         track_instances = self._generate_empty_tracks()
         num_frame = img.size(1)
-        # init gt instances!
+        # gt 인스턴스 초기화
         gt_instances_list = []
 
         for i in range(num_frame):
             gt_instances = Instances((1, 1))
             boxes = gt_bboxes_3d[0][i].tensor.to(img.device)
-            # normalize gt bboxes here!
+            # 여기서 gt 바운딩 박스 정규화
             boxes = normalize_bbox(boxes, self.pc_range)
             sd_boxes = gt_sdc_bbox[0][i].tensor.to(img.device)
             sd_boxes = normalize_bbox(sd_boxes, self.pc_range)
@@ -529,7 +528,7 @@ class UniADTrack(MVXTwoStageDetector):
             gt_instances.obj_ids = gt_inds[0][i]
             gt_instances.past_traj = gt_past_traj[0][i].float()
             gt_instances.past_traj_mask = gt_past_traj_mask[0][i].float()
-            gt_instances.sdc_boxes = torch.cat([sd_boxes for _ in range(boxes.shape[0])], dim=0)  # boxes.shape[0] sometimes 0
+            gt_instances.sdc_boxes = torch.cat([sd_boxes for _ in range(boxes.shape[0])], dim=0)  # boxes.shape[0]가 가끔 0일 때
             gt_instances.sdc_labels = torch.cat([gt_sdc_label[0][i] for _ in range(gt_labels_3d[0][i].shape[0])], dim=0)
             gt_instances_list.append(gt_instances)
 
@@ -540,7 +539,7 @@ class UniADTrack(MVXTwoStageDetector):
         for i in range(num_frame):
             prev_img = img[:, :i, ...] if i != 0 else img[:, :1, ...]
             prev_img_metas = copy.deepcopy(img_metas)
-            # TODO: Generate prev_bev in an RNN way.
+            # TODO: RNN 방식으로 prev_bev 생성
 
             img_single = torch.stack([img_[i] for img_ in img], dim=0)
             img_metas_single = [copy.deepcopy(img_metas[0][i])]
@@ -586,7 +585,7 @@ class UniADTrack(MVXTwoStageDetector):
 
     def upsample_bev_if_tiny(self, outs_track):
         if outs_track["bev_embed"].size(0) == 100 * 100:
-            # For tiny model
+            # 작은 모델의 경우
             # bev_emb
             bev_embed = outs_track["bev_embed"] # [10000, 1, 256]
             dim, _, _ = bev_embed.size()
@@ -637,7 +636,7 @@ class UniADTrack(MVXTwoStageDetector):
         img: B, num_cam, C, H, W = img.shape
         """
 
-        """ velo update """
+        """ 속도 업데이트 """
         active_inst = track_instances[track_instances.obj_idxes >= 0]
         other_inst = track_instances[track_instances.obj_idxes < 0]
 
@@ -654,7 +653,7 @@ class UniADTrack(MVXTwoStageDetector):
 
         track_instances = Instances.cat([other_inst, active_inst])
 
-        # NOTE: You can replace BEVFormer with other BEV encoder and provide bev_embed here
+        # 주의: 여기서 BEVFormer를 다른 BEV 인코더로 교체하고 bev_embed를 제공할 수 있음
         bev_embed, bev_pos = self.get_bevs(img, img_metas, prev_bev=prev_bev)
         det_output = self.pts_bbox_head.get_detections(
             bev_embed, 
@@ -677,29 +676,29 @@ class UniADTrack(MVXTwoStageDetector):
             "bev_pos": bev_pos,
         }
 
-        """ update track instances with predict results """
+        """ 예측 결과로 트랙 인스턴스 업데이트 """
         track_scores = output_classes[-1, 0, :].sigmoid().max(dim=-1).values
-        # each track will be assigned an unique global id by the track base.
+        # 각 트랙은 트랙 베이스에 의해 고유의 글로벌 ID가 할당됨
         track_instances.scores = track_scores
         # track_instances.track_scores = track_scores  # [300]
         track_instances.pred_logits = output_classes[-1, 0]  # [300, num_cls]
         track_instances.pred_boxes = output_coords[-1, 0]  # [300, box_dim]
         track_instances.output_embedding = query_feats[-1][0]  # [300, feat_dim]
         track_instances.ref_pts = last_ref_pts[0]
-        # hard_code: assume the 901 query is sdc query 
+        # 하드코딩: 901번째 쿼리는 sdc 쿼리라고 가정
         track_instances.obj_idxes[900] = -2 #_500
-        """ update track base """
+        """ 트랙 베이스 업데이트 """
         self.track_base.update(track_instances, None)
        
-        active_index = (track_instances.obj_idxes>=0) & (track_instances.scores >= self.track_base.filter_score_thresh)    # filter out sleep objects
+        active_index = (track_instances.obj_idxes>=0) & (track_instances.scores >= self.track_base.filter_score_thresh)    # 슬립 객체 필터링
         out.update(self.select_active_track_query(track_instances, active_index, img_metas))
         out.update(self.select_sdc_track_query(track_instances[track_instances.obj_idxes==-2], img_metas))
 
-        """ update with memory_bank """
+        """ 메모리 뱅크 업데이트 """
         if self.memory_bank is not None:
             track_instances = self.memory_bank(track_instances)
 
-        """  Update track instances using matcher """
+        """ 매처를 사용하여 트랙 인스턴스 업데이트 """
         tmp = {}
         tmp["init_track_instances"] = self._generate_empty_tracks()
         tmp["track_instances"] = track_instances
@@ -717,13 +716,13 @@ class UniADTrack(MVXTwoStageDetector):
         img_metas=None,
         timestamp=None,
     ):
-        """only support bs=1 and sequential input"""
+        """bs=1 및 순차 입력만 지원"""
 
-        bs = img.size(0) #_ Batch Size
+        bs = img.size(0) #_ 배치 크기
         print(f"bs: {bs}")
         # img_metas = img_metas[0]
 
-        """ init track instances for first frame """
+        """ 첫 번째 프레임에 대한 트랙 인스턴스 초기화 """
         if (
             self.test_track_instances is None
             or img_metas[0]["scene_token"] != self.scene_token
@@ -742,13 +741,13 @@ class UniADTrack(MVXTwoStageDetector):
             l2g_r2 = l2g_r_mat
             l2g_t2 = l2g_t
         
-        """ get time_delta and l2g r/t infos """
-        """ update frame info for next frame"""
+        """ time_delta 및 l2g r/t 정보 가져오기 """
+        """ 다음 프레임을 위한 프레임 정보 업데이트 """
         self.timestamp = timestamp
         self.l2g_t = l2g_t
         self.l2g_r_mat = l2g_r_mat
 
-        """ predict and update """
+        """ 예측 및 업데이트 """
         prev_bev = self.prev_bev
         frame_res = self._forward_single_frame_inference(
             img,
@@ -823,7 +822,7 @@ class UniADTrack(MVXTwoStageDetector):
             - track_ids
             - tracking_score
         """
-        # filter out sleep querys
+        # sleep 쿼리 필터링
         if instances.pred_logits.numel() == 0:
             return [None]
         bbox_dict = dict(
@@ -852,4 +851,3 @@ class UniADTrack(MVXTwoStageDetector):
             result_dict = None
 
         return [result_dict]
-

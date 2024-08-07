@@ -1,4 +1,3 @@
-
 # ---------------------------------------------
 # Copyright (c) OpenMMLab. All rights reserved.
 # ---------------------------------------------
@@ -25,14 +24,12 @@ ext_module = ext_loader.load_ext(
 
 @TRANSFORMER_LAYER_SEQUENCE.register_module()
 class BEVFormerEncoder(TransformerLayerSequence):
-
     """
     Attention with both self and cross
     Implements the decoder in DETR transformer.
     Args:
-        return_intermediate (bool): Whether to return intermediate outputs.
-        coder_norm_cfg (dict): Config of last normalization layer. Default：
-            `LN`.
+        return_intermediate (bool): 중간 출력 값을 반환할지 여부
+        coder_norm_cfg (dict): 마지막 정규화 레이어의 설정. 기본값: `LN`.
     """
 
     def __init__(self, *args, pc_range=None, num_points_in_pillar=4, return_intermediate=False, dataset_type='nuscenes',
@@ -47,19 +44,16 @@ class BEVFormerEncoder(TransformerLayerSequence):
 
     @staticmethod
     def get_reference_points(H, W, Z=8, num_points_in_pillar=4, dim='3d', bs=1, device='cuda', dtype=torch.float):
-        """Get the reference points used in SCA and TSA.
+        """SCA 및 TSA에 사용되는 참조 점 가져오기.
         Args:
-            H, W: spatial shape of bev.
-            Z: hight of pillar.
-            D: sample D points uniformly from each pillar.
-            device (obj:`device`): The device where
-                reference_points should be.
+            H, W: bev의 공간 크기.
+            Z: pillar의 높이.
+            D: 각 pillar에서 균일하게 샘플링하는 포인트 수.
+            device (obj:`device`): reference_points가 있어야 하는 장치.
         Returns:
-            Tensor: reference points used in decoder, has \
-                shape (bs, num_keys, num_levels, 2).
+            Tensor: 디코더에서 사용되는 참조 점, shape (bs, num_keys, num_levels, 2).
         """
-
-        # reference points in 3D space, used in spatial cross-attention (SCA)
+        # 3D 공간의 참조 점, 공간 교차 주의 (SCA)에 사용
         if dim == '3d':
             zs = torch.linspace(0.5, Z - 0.5, num_points_in_pillar, dtype=dtype,
                                 device=device).view(-1, 1, 1).expand(num_points_in_pillar, H, W) / Z
@@ -71,8 +65,7 @@ class BEVFormerEncoder(TransformerLayerSequence):
             ref_3d = ref_3d.permute(0, 3, 1, 2).flatten(2).permute(0, 2, 1)
             ref_3d = ref_3d[None].repeat(bs, 1, 1, 1)
             return ref_3d
-
-        # reference points on 2D bev plane, used in temporal self-attention (TSA).
+        # 2D bev 평면의 참조 점, 시간적 자기 주의 (TSA)에 사용
         elif dim == '2d':
             ref_y, ref_x = torch.meshgrid(
                 torch.linspace(
@@ -86,10 +79,18 @@ class BEVFormerEncoder(TransformerLayerSequence):
             ref_2d = ref_2d.repeat(bs, 1, 1).unsqueeze(2)
             return ref_2d
 
-    # This function must use fp32!!!
+    # 이 함수는 반드시 fp32를 사용!!!
     @force_fp32(apply_to=('reference_points', 'img_metas'))
     def point_sampling(self, reference_points, pc_range,  img_metas):
-
+        """포인트 샘플링 함수.
+        Args:
+            reference_points (Tensor): 참조 포인트
+            pc_range (list): 포인트 클라우드 범위
+            img_metas (list): 이미지 메타데이터
+        Returns:
+            reference_points_cam (Tensor): 카메라 좌표계의 참조 포인트
+            bev_mask (Tensor): BEV 마스크
+        """
         lidar2img = []
         for img_meta in img_metas:
             lidar2img.append(img_meta['lidar2img'])
@@ -159,25 +160,15 @@ class BEVFormerEncoder(TransformerLayerSequence):
                 shift=0.,
                 img_metas=None,
                 **kwargs):
-        """Forward function for `TransformerDecoder`.
+        """`TransformerDecoder`의 forward 함수
         Args:
-            bev_query (Tensor): Input BEV query with shape
-                `(num_query, bs, embed_dims)`.
-            key & value (Tensor): Input multi-cameta features with shape
-                (num_cam, num_value, bs, embed_dims)
-            reference_points (Tensor): The reference
-                points of offset. has shape
-                (bs, num_query, 4) when as_two_stage,
-                otherwise has shape ((bs, num_query, 2).
-            valid_ratios (Tensor): The radios of valid
-                points on the feature map, has shape
-                (bs, num_levels, 2)
+            bev_query (Tensor): shape `(num_query, bs, embed_dims)`의 입력 BEV 쿼리
+            key & value (Tensor): shape (num_cam, num_value, bs, embed_dims)의 입력 멀티-카메라 특징
+            reference_points (Tensor): 옵셋의 참조 포인트. as_two_stage일 때는 shape (bs, num_query, 4), 그렇지 않으면 shape (bs, num_query, 2).
+            valid_ratios (Tensor): 특징 맵의 유효 포인트의 비율, shape (bs, num_levels, 2)
         Returns:
-            Tensor: Results with shape [1, num_query, bs, embed_dims] when
-                return_intermediate is `False`, otherwise it has shape
-                [num_layers, num_query, bs, embed_dims].
+            Tensor: 결과 shape [1, num_query, bs, embed_dims] (return_intermediate가 `False`일 때), 그렇지 않으면 [num_layers, num_query, bs, embed_dims].
         """
-
         output = bev_query
         intermediate = []
 
@@ -189,7 +180,7 @@ class BEVFormerEncoder(TransformerLayerSequence):
         reference_points_cam, bev_mask = self.point_sampling(
             ref_3d, self.pc_range, img_metas)
 
-        # bug: this code should be 'shift_ref_2d = ref_2d.clone()', we keep this bug for reproducing our results in paper.
+        # 버그: 이 코드는 'shift_ref_2d = ref_2d.clone()'이어야 합니다. 논문의 결과 재현을 위해 이 버그를 유지합니다.
         shift_ref_2d = ref_2d  # .clone()
         shift_ref_2d += shift[:, None, None, :]
 
@@ -237,24 +228,17 @@ class BEVFormerEncoder(TransformerLayerSequence):
 
 @TRANSFORMER_LAYER.register_module()
 class BEVFormerLayer(MyCustomBaseTransformerLayer):
-    """Implements decoder layer in DETR transformer.
+    """DETR transformer에서 디코더 레이어를 구현합니다.
     Args:
         attn_cfgs (list[`mmcv.ConfigDict`] | list[dict] | dict )):
-            Configs for self_attention or cross_attention, the order
-            should be consistent with it in `operation_order`. If it is
-            a dict, it would be expand to the number of attention in
-            `operation_order`.
-        feedforward_channels (int): The hidden dimension for FFNs.
-        ffn_dropout (float): Probability of an element to be zeroed
-            in ffn. Default 0.0.
-        operation_order (tuple[str]): The execution order of operation
-            in transformer. Such as ('self_attn', 'norm', 'ffn', 'norm').
-            Default: None
-        act_cfg (dict): The activation config for FFNs. Default: `LN`
-        norm_cfg (dict): Config dict for normalization layer.
-            Default: `LN`.
-        ffn_num_fcs (int): The number of fully-connected layers in FFNs.
-            Default: 2.
+            self_attention 또는 cross_attention에 대한 설정. `operation_order`에서 순서와 일치해야 합니다.
+            dict인 경우, `operation_order`의 attention 수로 확장됩니다.
+        feedforward_channels (int): FFNs의 숨겨진 차원.
+        ffn_dropout (float): ffn에서 요소가 0이 될 확률. 기본값 0.0.
+        operation_order (tuple[str]): transformer에서 실행 순서. ('self_attn', 'norm', 'ffn', 'norm')과 같은. 기본값: None
+        act_cfg (dict): FFNs를 위한 활성화 설정. 기본값: `LN`
+        norm_cfg (dict): 정규화 레이어에 대한 설정 dict. 기본값: `LN`.
+        ffn_num_fcs (int): FFNs에서 완전 연결 레이어 수. 기본값: 2.
     """
 
     def __init__(self,
@@ -300,35 +284,26 @@ class BEVFormerLayer(MyCustomBaseTransformerLayer):
                 level_start_index=None,
                 prev_bev=None,
                 **kwargs):
-        """Forward function for `TransformerDecoderLayer`.
+        """`TransformerDecoderLayer`의 forward 함수
 
-        **kwargs contains some specific arguments of attentions.
+        **kwargs는 attentions의 특정 인자를 포함합니다.
 
         Args:
-            query (Tensor): The input query with shape
-                [num_queries, bs, embed_dims] if
-                self.batch_first is False, else
-                [bs, num_queries embed_dims].
-            key (Tensor): The key tensor with shape [num_keys, bs,
-                embed_dims] if self.batch_first is False, else
-                [bs, num_keys, embed_dims] .
-            value (Tensor): The value tensor with same shape as `key`.
-            query_pos (Tensor): The positional encoding for `query`.
-                Default: None.
-            key_pos (Tensor): The positional encoding for `key`.
-                Default: None.
-            attn_masks (List[Tensor] | None): 2D Tensor used in
-                calculation of corresponding attention. The length of
-                it should equal to the number of `attention` in
-                `operation_order`. Default: None.
-            query_key_padding_mask (Tensor): ByteTensor for `query`, with
-                shape [bs, num_queries]. Only used in `self_attn` layer.
-                Defaults to None.
-            key_padding_mask (Tensor): ByteTensor for `query`, with
-                shape [bs, num_keys]. Default: None.
+            query (Tensor): shape [num_queries, bs, embed_dims]의 입력 쿼리, self.batch_first가 False일 때.
+                            그렇지 않으면 [bs, num_queries embed_dims].
+            key (Tensor): shape [num_keys, bs, embed_dims]의 키 텐서, self.batch_first가 False일 때.
+                            그렇지 않으면 [bs, num_keys, embed_dims].
+            value (Tensor): `key`와 동일한 shape의 value 텐서.
+            query_pos (Tensor): `query`에 대한 positional encoding. 기본값: None.
+            key_pos (Tensor): `key`에 대한 positional encoding. 기본값: None.
+            attn_masks (List[Tensor] | None): 2D 텐서로, 해당 attention 계산에 사용됩니다.
+                                              길이는 `operation_order`의 attention 수와 같아야 합니다. 기본값: None.
+            query_key_padding_mask (Tensor): shape [bs, num_queries]의 `query`에 대한 ByteTensor, `self_attn` 레이어에서만 사용됩니다.
+                                              기본값: None.
+            key_padding_mask (Tensor): shape [bs, num_keys]의 `query`에 대한 ByteTensor. 기본값: None.
 
         Returns:
-            Tensor: forwarded results with shape [num_queries, bs, embed_dims].
+            Tensor: shape [num_queries, bs, embed_dims]의 결과.
         """
 
         norm_index = 0
