@@ -8,7 +8,10 @@ plugin_dir = "projects/mmdet3d_plugin/"
 # If point cloud range is changed, the models should also change their point
 # cloud range accordingly
 point_cloud_range = [-51.2, -51.2, -5.0, 51.2, 51.2, 3.0]
+# x와 y 방향으로 각각 -51.2m에서 51.2m까지의 범위를 커버
+# 차량을 중심으로 약 100m x 100m 영역을 나타냄
 voxel_size = [0.2, 0.2, 8]
+# x와 y 방향으로 0.2m의 해상도 표현
 patch_size = [102.4, 102.4]
 img_norm_cfg = dict(mean=[103.530, 116.280, 123.675], std=[1.0, 1.0, 1.0], to_rgb=False)
 # For nuScenes we usually do 10-class detection
@@ -38,7 +41,7 @@ bev_w_ = 200
 _feed_dim_ = _ffn_dim_
 _dim_half_ = _pos_dim_
 canvas_size = (bev_h_, bev_w_)
-queue_length = 5 # 3 -> 5  # each sequence contains `queue_length` frames.
+queue_length = 3 # 3 -> 5  # each sequence contains `queue_length` frames.
 
 ### traj prediction args ###
 predict_steps = 12
@@ -153,7 +156,7 @@ model = dict(
             embed_dims=_dim_,
             encoder=dict(
                 type="BEVFormerEncoder",
-                num_layers=6, #_ 원본: 6 / 수정: 4
+                num_layers=4, #_ 원본: 6 / 수정: 4
                 pc_range=point_cloud_range,
                 num_points_in_pillar=4,
                 return_intermediate=False,
@@ -179,7 +182,7 @@ model = dict(
                     ffn_cfgs=dict( #+
                         type='FFN', #+
                         embed_dims=_dim_, #+
-                        feedforward_channels=2048, #+
+                        feedforward_channels=1024, #+
                         num_fcs=2, #+
                         ffn_drop=0., #+
                         act_cfg=dict(type='ReLU', inplace=True), #+
@@ -199,7 +202,7 @@ model = dict(
             ),
             decoder=dict(
                 type="DetectionTransformerDecoder",
-                num_layers=6, #_ 원본: 6 / 수정: 4
+                num_layers=4, #_ 원본: 6 / 수정: 4
                 return_intermediate=True,
                 transformerlayers=dict(
                     type="DetrTransformerDecoderLayer",
@@ -220,7 +223,7 @@ model = dict(
                     ffn_cfgs=dict( #+
                         type='FFN', #+
                         embed_dims=_dim_, #+
-                        feedforward_channels=2048, #+
+                        feedforward_channels=1024, #+
                         num_fcs=2, #+
                         ffn_drop=0., #+
                         act_cfg=dict(type='ReLU', inplace=True), #+
@@ -277,7 +280,7 @@ model = dict(
             type='SegDeformableTransformer',
             encoder=dict(
                 type='DetrTransformerEncoder',
-                num_layers=6, #_ 원본: 6 / 수정: 4
+                num_layers=4, #_ 원본: 6 / 수정: 4
                 transformerlayers=dict(
                     type='BaseTransformerLayer',
                     attn_cfgs=dict(
@@ -301,7 +304,7 @@ model = dict(
                     operation_order=('self_attn', 'norm', 'ffn', 'norm'))),
             decoder=dict(
                 type='DeformableDetrTransformerDecoder',
-                num_layers=6, #_ 원본: 6 / 수정: 4
+                num_layers=4, #_ 원본: 6 / 수정: 4
                 return_intermediate=True,
                 transformerlayers=dict(
                     type='DetrTransformerDecoderLayer',
@@ -321,7 +324,7 @@ model = dict(
                     ffn_cfgs=dict( #+
                         type='FFN', #+
                         embed_dims=_dim_, #+
-                        feedforward_channels=2048, #+
+                        feedforward_channels=1024, #+
                         num_fcs=2, #+
                         ffn_drop=0., #+
                         act_cfg=dict(type='ReLU', inplace=True), #+
@@ -392,16 +395,20 @@ model = dict(
                     attn_drop=0.0,
                     proj_drop=0.0,
                     dropout_layer=None,
-                    batch_first=False),
+                    batch_first=False), 
+
+
                 ffn_cfgs=dict(
                     embed_dims=128, #_ 원본: 256 / 수정: 128
-                    feedforward_channels=2048,  # change to 512 #_ 원본: 2048 / 수정: 1024
+                    feedforward_channels=1024,  # change to 512 #_ 원본: 2048 / 수정: 1024
                     num_fcs=2,
                     act_cfg=dict(type='ReLU', inplace=True),
                     ffn_drop=0.0,
                     dropout_layer=None,
                     add_identity=True),
-                feedforward_channels=2048, #_ 원본: 2048 / 수정: 1024
+
+
+                feedforward_channels=1024, #_ 원본: 2048 / 수정: 1024
                 operation_order=('self_attn', 'norm', 'cross_attn', 'norm',
                                  'ffn', 'norm')),
             init_cfg=None),
@@ -476,7 +483,7 @@ model = dict(
                 ffn_cfgs=dict( #+
                         type='FFN', #+
                         embed_dims=_dim_, #+
-                        feedforward_channels=2048, #+
+                        feedforward_channels=1024, #+
                         num_fcs=2, #+
                         ffn_drop=0., #+
                         act_cfg=dict(type='ReLU', inplace=True), #+
@@ -717,7 +724,7 @@ data = dict(
 )
 optimizer = dict(
     type="AdamW",
-    lr=2e-4, #원본: 2e-4 / 수정: 1e-4  # 사이즈 축소에 대한 학습률 낮춤
+    lr=1e-4, #원본: 2e-4 / 수정: 1e-4  # 사이즈 축소에 대한 학습률 낮춤
     paramwise_cfg=dict(
         custom_keys={
             "img_backbone": dict(lr_mult=0.1),
@@ -734,17 +741,22 @@ lr_config = dict(
     warmup_ratio=1.0 / 3,
     min_lr_ratio=1e-3,
 )
-total_epochs = 24 #원본: 24 / 수정: 20  # 사이즈 축소에 대한, 학습률 낮춤에 대한 에폭수 증가
-evaluation = dict(interval=4, pipeline=test_pipeline)
+total_epochs = 20 #원본: 24 / 수정: 20  # 사이즈 축소에 대한, 학습률 낮춤에 대한 에폭수 증가 # 원본 20?
+evaluation = dict(interval=4, pipeline=test_pipeline) # 4 epoch마다 validation
 runner = dict(type="EpochBasedRunner", max_epochs=total_epochs)
 log_config = dict(
     interval=10, hooks=[dict(type="TextLoggerHook"), dict(type="TensorboardLoggerHook")]
 )
 checkpoint_config = dict(interval=1)
-load_from = "/home/hyun/local_storage/code/UniAD/ckpts/uniad_base_track_map.pth"
-# --> 사전 학습된 모델과의 불일치: load_from에 지정된 사전 학습된 모델은 원래 구조에 맞춰져 있을 텐데, 변경된 구조와 맞지 않을 수 있음.
+load_from = "/home/hyun/local_storage/code/UniAD/projects/work_dirs/stage1_track_map/base_track_map/latest.pth"
+            # 사전 학습된 모델: 구조 일치할 것.
 
-# resume_from = "/UniAD/projects/work_dirs/stage1_track_map/base_track_map/latest.pth" 
-#             #_ 마지막 학습 log 불러옴   #e2e는 경로 수정 필요
+# resume_from = "/home/hyun/local_storage/code/UniAD/projects/work_dirs/stage2_e2e/base_e2e/epoch_3.pth" 
+                # val test 에러
+                # 1차 에러: compute_on_step 수정
+                # 2차 에러: pip install torchmetrics==0.8.2 (버전 DOWN) (안되면 0.7.0 진행)
+                
+# resume_from = "/home/hyun/local_storage/code/UniAD/projects/work_dirs/stage2_e2e/base_e2e/latest.pth"
+               # 마지막 학습 log 불러옴 (학습 이어서)   
 
 find_unused_parameters = True

@@ -231,7 +231,9 @@ def collect_results_cpu(result_part, size, tmpdir=None):
         # the dataloader may pad some samples
         ordered_results = ordered_results[:size]
         # remove tmp dir
-        shutil.rmtree(tmpdir) #_ 학습된 값 지움 (불러오는거 오래걸림 - 주석처리로 안지움)
+        shutil.rmtree(tmpdir) # 학습된 값 지움 
+                            # 주석 목적: 디버깅 할때 불러오는거 오래걸림
+                            # 주석처리로 데이터 학습 값 안 지움
         return ordered_results
 
 
