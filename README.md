@@ -116,10 +116,17 @@
 - ```pip install numpy==1.22.4```
 - ```pip install Verify```
 - ```pip install yapf==0.40.1```
+- ```pip install nuscenes-devkit==1.1.10```
+- ```pip install pandas==1.4.4```
+- ```pip install opencv-python==4.9.0.80```
+- ```pip install pillow==9.4.0```
+
+
 
 
 - test, train 파일 import os 밑에 2줄 추가
-- ```import sys <br/> sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))```
+- ```import sys```
+- ```sys.path.append(os.path.dirname(os.path.abspath(os.path.dirname(__file__))))```
 
 
 
