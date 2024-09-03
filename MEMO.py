@@ -18,6 +18,10 @@ from mmdet3d.core.bbox.coders import build_bbox_coder
 print("\n")
 
 """
+ps -ef | grep hyun
+kill -9 
+watch -d -n 0.5 nvidia-smi
+
 #Train e2e 3090 GPU 3
 
 nohup ./tools/uniad_dist_train.sh ./projects/configs/stage2_e2e/base_e2e.py 3 > output.log 2>&1 &
@@ -28,6 +32,7 @@ watch -d -n 0.5 nvidia-smi
 3090
 2차 DownScale Train data 불러와서 e2e 학습 진행 중
 -> 24.08.29 완료
+24.09.02 재학습 (mapping 값 이상)
 
 #test
 nohup ./tools/uniad_dist_eval.sh ./projects/configs/stage2_e2e/base_e2e.py ./projects/work_dirs/stage2_e2e/base_e2e/latest.pth 3 > output.log 2>&1 &
@@ -35,6 +40,11 @@ disown -h
 메모리: 평균 5GB
 (24.08.29 10시 시작) (30분정도 소요)
 /home/hyun/local_storage/code/UniAD/test/base_e2e/2차 data test: Thu_Aug_29_10_27_49_2024/2차 data TEST output.log
+
+
+############ DV-1 재검증
+nohup ./tools/uniad_dist_train.sh ./projects/configs/stage1_track_map/base_track_map.py 3 > output.log 2>&1 &
+disown -h
 
 
 #Visualization

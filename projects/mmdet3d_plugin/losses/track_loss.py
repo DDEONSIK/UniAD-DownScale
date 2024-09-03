@@ -365,10 +365,10 @@ class ClipMatcher(nn.Module):
         pred_logits_i = track_instances.pred_logits
         pred_boxes_i = track_instances.pred_boxes
         # modified the hard code, 900:901, sdc query
-        pred_sdc_logits_i = track_instances.pred_logits[900:901].unsqueeze(0)  #_500:501
-        pred_sdc_boxes_i = track_instances.pred_boxes[900:901].unsqueeze(0) #_500:501
+        pred_sdc_logits_i = track_instances.pred_logits[500:501].unsqueeze(0)  #_500:501
+        pred_sdc_boxes_i = track_instances.pred_boxes[500:501].unsqueeze(0) #_500:501
         # -2 means the sdc query in this code
-        track_instances.obj_idxes[900]=-2 #_500
+        track_instances.obj_idxes[500]=-2 #_500
         pred_past_trajs_i = track_instances.pred_past_trajs  # predicted past trajs of i-th image.
 
         obj_idxes = gt_instances_i.obj_ids

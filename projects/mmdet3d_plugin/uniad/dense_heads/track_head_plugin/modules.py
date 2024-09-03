@@ -1,3 +1,6 @@
+import matplotlib.pyplot as plt
+import seaborn as sns
+import numpy as np
 import torch
 import torch.nn.functional as F
 from torch import nn
@@ -42,6 +45,9 @@ class MemoryBank(nn.Module):  # QIM, TAN 관련
             save_period[save_period > 0] -= 1
             save_period[saved_idxes] = self.save_period
 
+        # # 시각화를 위해 업데이트 전 메모리 뱅크 상태 저장
+        # before_mem_bank = track_instances.mem_bank.clone() # 추가
+
         saved_embed = embed[saved_idxes]
         if len(saved_embed) > 0:
             prev_embed = track_instances.mem_bank[saved_idxes]
@@ -51,6 +57,82 @@ class MemoryBank(nn.Module):  # QIM, TAN 관련
                  torch.zeros((len(saved_embed), 1), dtype=torch.bool, device=device)], dim=1)
             track_instances.mem_bank = track_instances.mem_bank.clone()
             track_instances.mem_bank[saved_idxes] = torch.cat([prev_embed[:, 1:], save_embed], dim=1)
+        # self.visualize_update(track_instances, saved_idxes, before_mem_bank, track_instances.mem_bank) # 추가
+
+
+    # def visualize_update(self, track_instances, saved_idxes, before_mem_bank, after_mem_bank):
+    #     plt.figure(figsize=(20, 15))
+
+    #     # 1. 점수 분포 시각화
+    #     plt.subplot(3, 2, 1)
+    #     sns.histplot(track_instances.scores.cpu().detach().numpy(), bins=20, kde=True)
+    #     plt.title('Score Distribution')
+    #     plt.xlabel('Score')
+    #     plt.ylabel('Count')
+    #     plt.savefig('/home/hyun/local_storage/code/UniAD/projects/mmdet3d_plugin/uniad/dense_heads/track_head-TrackFormer_Visualization/score_distribution.png')  # 결과 저장
+
+    #     # 2. 저장된 인덱스 시각화
+    #     plt.subplot(3, 2, 2)
+    #     plt.imshow(saved_idxes.cpu().detach().numpy().reshape(1, -1), cmap='binary', aspect='auto')
+    #     plt.title('Saved Indexes')
+    #     plt.xlabel('Track Instance')
+    #     plt.yticks([])
+    #     plt.savefig('/home/hyun/local_storage/code/UniAD/projects/mmdet3d_plugin/uniad/dense_heads/track_head-TrackFormer_Visualization/saved_indexes.png')  # 결과 저장
+
+    #     # 3. 임베딩 변화 시각화 (첫 번째 저장된 인스턴스에 대해)
+    #     if saved_idxes.sum() > 0:
+    #         first_saved_idx = saved_idxes.nonzero()[0][0]
+    #         plt.subplot(3, 2, 3)
+    #         plt.plot(before_mem_bank[first_saved_idx, 0].cpu().detach().numpy(), label='Before')
+    #         plt.plot(after_mem_bank[first_saved_idx, 0].cpu().detach().numpy(), label='After')
+    #         plt.title(f'Embedding Change for Instance {first_saved_idx}')
+    #         plt.xlabel('Dimension')
+    #         plt.ylabel('Value')
+    #         plt.legend()
+    #         plt.savefig(f'/home/hyun/local_storage/code/UniAD/projects/mmdet3d_plugin/uniad/dense_heads/track_head-TrackFormer_Visualization/embedding_change_instance_{first_saved_idx}.png')  # 결과 저장
+
+    #     # 4. 메모리 뱅크 변화 시각화
+    #     plt.subplot(3, 2, 4)
+    #     diff = (after_mem_bank - before_mem_bank).abs().mean(dim=-1)
+    #     sns.heatmap(diff.cpu().detach().numpy(), cmap='viridis')
+    #     plt.title('Memory Bank Change (Mean Absolute Difference)')
+    #     plt.xlabel('Time Step')
+    #     plt.ylabel('Track Instance')
+    #     plt.savefig('/home/hyun/local_storage/code/UniAD/projects/mmdet3d_plugin/uniad/dense_heads/track_head-TrackFormer_Visualization/memory_bank_change.png')  # 결과 저장
+
+    #     # 5. 메모리 패딩 마스크 시각화
+    #     plt.subplot(3, 2, 5)
+    #     sns.heatmap(track_instances.mem_padding_mask.cpu().detach().numpy(), cmap='binary')
+    #     plt.title('Memory Padding Mask')
+    #     plt.xlabel('Time Step')
+    #     plt.ylabel('Track Instance')
+    #     plt.savefig('/home/hyun/local_storage/code/UniAD/projects/mmdet3d_plugin/uniad/dense_heads/track_head-TrackFormer_Visualization/memory_padding_mask.png')  # 결과 저장
+
+    #     # 6. 저장 주기 분포 시각화
+    #     plt.subplot(3, 2, 6)
+    #     sns.histplot(track_instances.save_period.cpu().detach().numpy(), bins=20, kde=True)
+    #     plt.title('Save Period Distribution')
+    #     plt.xlabel('Save Period')
+    #     plt.ylabel('Count')
+    #     plt.savefig('/home/hyun/local_storage/code/UniAD/projects/mmdet3d_plugin/uniad/dense_heads/track_head-TrackFormer_Visualization/save_period_distribution.png')  # 결과 저장
+
+    #     plt.tight_layout()
+    #     plt.close()
+
+    #     # Attention map 시각화 추가
+    #     plt.figure(figsize=(10, 10))
+    #     bev_embed_np = track_instances.mem_bank.cpu().detach().numpy()
+    #     bev_embed_np = bev_embed_np.reshape(self.bev_h, self.bev_w, -1)
+    #     bev_max = np.max(bev_embed_np, axis=2)
+    #     plt.imshow(bev_max, cmap='viridis', interpolation='nearest')
+    #     plt.colorbar()
+    #     plt.title('BEV Feature Map - max')
+    #     plt.xlabel('BEV Width')
+    #     plt.ylabel('BEV Height')
+    #     plt.savefig('/home/hyun/local_storage/code/UniAD/projects/mmdet3d_plugin/uniad/dense_heads/track_head-TrackFormer_Visualization/bev_ftr.png')  # 결과 저장
+    #     plt.close()
+
+
 
     def _forward_temporal_attn(self, track_instances):
         if len(track_instances) == 0:

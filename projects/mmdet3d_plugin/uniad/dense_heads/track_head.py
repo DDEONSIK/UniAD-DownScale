@@ -6,6 +6,7 @@
 #---------------------------------------------------------------------------------#
 
 import copy
+import os
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -36,6 +37,10 @@ class BEVFormerTrackHead(DETRHead):
             the Encoder and Decoder.
         bev_h, bev_w (int): spatial shape of BEV queries.
     """
+    
+    # 클래스 변수로 save_counter 선언
+    #시각화 저장 횟수를 관리하기 위한 카운터 추가
+    save_counter = 0
 
     def __init__(self, # 필요한 매개변수와 변수 설정 # 부모 클래스 DETRHead 초기화
                  *args,
@@ -486,6 +491,173 @@ class BEVFormerTrackHead(DETRHead):
 
 
         return outs  # 결과 반환
+
+    
+    def get_detections_visualization_ver100(
+        self,
+        bev_embed,
+        hs,
+        outputs_trajs,
+        last_ref_points
+    ):
+        # 주요 변수
+        '''
+        bev_embed:            BEV feature 임베딩  --- 완료
+        object_query_embeds:  object query 임베딩  ---------
+        ref_points:           reference points
+        hs:                   트랜스포머에서 출력된 상태 -----
+
+        outputs_classes:    각 쿼리에 대해 예측된 클래스 점수
+                            각 쿼리가 특정 클래스에 속할 확률 ------
+
+        outputs_coords:       바운딩 박스 좌표 예측 결과
+        outputs_trajs:        과거 및 미래 궤적 예측 결과 -----
+        last_ref_points:      track query에 해당하는 마지막 예측된 reference points ----
+        '''
+
+        # BEV feature map 시각화  -완료
+        # bev_embed_np = bev_embed.cpu().detach().numpy()  # GPU에 있는 텐서 -> CPU로 이동, numpy 배열로 변환
+        # # print('bev_embed_np shape:', bev_embed_np.shape)
+
+        # bev_embed_np = bev_embed_np.reshape(self.bev_h, self.bev_w, -1)  # feature map을 bev_h와 bev_w로 reshape
+        # # print('bev_embed_np reshaped:', bev_embed_np.shape)
+
+        # # 각 차원에 대해 최댓값 계산
+        # bev_max = np.max(bev_embed_np, axis=2)
+        # # print('bev_max shape:', bev_max.shape)
+
+        # # 시각화
+        # plt.figure(figsize=(10, 10))  # Figure 생성, 크기 10x10
+        # plt.imshow(bev_max, cmap='viridis', interpolation='nearest')  # 값 시각화, 색상: 'viridis', 보간: 'nearest'
+        # plt.colorbar()
+        # plt.title('BEV Feature Map - max')
+        # plt.xlabel('BEV Width')
+        # plt.ylabel('BEV Height')
+        # plt.savefig('/home/hyun/local_storage/code/UniAD/projects/mmdet3d_plugin/uniad/dense_heads/track_head-TrackFormer_Visualization/get_detections/bev_ftr.png')  # 결과 저장
+        # plt.close()
+
+
+
+        # BEV feature map 시각화 - 완료
+        print("BEV Feature Map 시각화")
+        bev_embed_np = bev_embed.cpu().detach().numpy()  # GPU에 있는 텐서 -> CPU로 이동, numpy 배열로 변환
+        # print('bev_embed_np shape:', bev_embed_np.shape)
+
+        bev_embed_np = bev_embed_np.reshape(self.bev_h, self.bev_w, -1)  # feature map을 bev_h와 bev_w로 reshape
+        # print('bev_embed_np reshaped:', bev_embed_np.shape)
+
+        # 각 차원에 대해 최댓값 계산
+        bev_max = np.max(bev_embed_np, axis=2)
+        # print('bev_max shape:', bev_max.shape)
+
+        # 시각화 및 저장 (50번에 한 번씩)
+        if self.save_counter % 50 == 0:
+            plt.figure(figsize=(10, 10))  # Figure 생성, 크기 10x10
+            plt.imshow(bev_max, cmap='viridis', interpolation='nearest')  # 값 시각화, 색상: 'viridis', 보간: 'nearest'
+            plt.colorbar()
+            plt.title('BEV Feature Map - max')
+            plt.xlabel('BEV Width')
+            plt.ylabel('BEV Height')
+            index = max([int(f.split('-')[-1].split('.')[0]) for f in os.listdir('/home/hyun/local_storage/code/UniAD/projects/mmdet3d_plugin/uniad/dense_heads/track_head-TrackFormer_Visualization/get_detections') if f.startswith('AIS3_bev_ftr-')] or [0]) + 1
+            plt.savefig(f'/home/hyun/local_storage/code/UniAD/projects/mmdet3d_plugin/uniad/dense_heads/track_head-TrackFormer_Visualization/get_detections/AIS3_bev_ftr-{index}.png')
+            plt.close()
+        self.save_counter += 1
+
+
+        #######################################################################
+
+        # object query visualization -- under modification
+        print("Object Query 시각화")
+        # print("object_query_embeds:", object_query_embeds.shape) # torch.Size([901, 256])
+
+        attention_map = hs[0, 0, :, :].cpu().detach().numpy() # First layer, first batch, all queries, all embeddings
+        # print('attention_map_before_reshape', attention_map.shape)
+
+        # The size of attention_map cannot be reshaped to (bev_h * bev_w, embed_dim), so handle it as below
+        if attention_map.shape[0] == self.bev_h * self.bev_w:
+            attention_map = attention_map.reshape(self.bev_h, self.bev_w, -1)[:, :, 0] # Use the first embedding dimension after reshape into the given shape
+        else:
+            # Skip reshape and continue without error
+            # print("Attention map size does not match bev_h * bev_w, skipping reshape")
+            pass
+
+        # Save the image only when necessary
+        if self.save_counter % 50 == 0:
+            plt.figure(figsize=(10, 10))
+            plt.imshow(attention_map, cmap='viridis', interpolation='nearest')
+            plt.colorbar()
+            plt.title('object query')
+            plt.xlabel('BEV Width')
+            plt.ylabel('BEV Height')
+            index = max([int(f.split('-')[-1].split('.')[0]) for f in os.listdir('/home/hyun/local_storage/code/UniAD/projects/mmdet3d_plugin/uniad/dense_heads/track_head-TrackFormer_Visualization/get_detections') if f.startswith('AIS3_attention_heatmap-')] or [0]) + 1
+            plt.savefig(f'/home/hyun/local_storage/code/UniAD/projects/mmdet3d_plugin/uniad/dense_heads/track_head-TrackFormer_Visualization/get_detections/AIS3_attention_heatmap-{index}.png')
+            plt.close()
+        self.save_counter += 1
+
+
+        #######################################################################
+
+
+        # 궤적 시각화  -- 수정중
+        print("Trajectories 시각화")
+        # print("outputs_trajs:", outputs_trajs.shape)
+        trajectories = outputs_trajs.cpu().detach().numpy()
+        plt.figure(figsize=(10, 10))
+        for traj in trajectories[0]:  # batch size가 1이라고 가정
+            for q in traj:  # num_queries
+                past_traj = q[:self.past_steps]
+                fut_traj = q[self.past_steps:]
+                plt.plot(past_traj[:, 0], past_traj[:, 1], 'r-')  # 과거 궤적
+                plt.plot(fut_traj[:, 0], fut_traj[:, 1], 'g-')  # 미래 궤적
+
+        plt.title('Trajectories')
+        plt.xlabel('X')
+        plt.ylabel('Y')
+
+        if self.save_counter % 50 == 0: #50번 마다 저장
+            index = max([int(f.split('-')[-1].split('.')[0]) for f in os.listdir('/home/hyun/local_storage/code/UniAD/projects/mmdet3d_plugin/uniad/dense_heads/track_head-TrackFormer_Visualization/get_detections/AIS3_trajectories') if f.startswith('AIS3_trajectories-')] or [0]) + 1
+            plt.savefig(f'/home/hyun/local_storage/code/UniAD/projects/mmdet3d_plugin/uniad/dense_heads/track_head-TrackFormer_Visualization/get_detections/AIS3_trajectories/AIS3_trajectories-{index}.png')
+        plt.close()
+        self.save_counter += 1
+
+        #######################################################################
+        #######################################################################
+        #######################################################################
+
+        # Track Queries - 수정중
+        print("Track Queries 시각화")
+        plt.figure(figsize=(10, 10))
+
+        # 각 쿼리 포인트를 점으로 시각화 (첫 번째 프레임)
+        plt.scatter(last_ref_points[0, :, 0].cpu().detach().numpy(), 
+                    last_ref_points[0, :, 1].cpu().detach().numpy(), 
+                    c='r', label='Predicted Points (First Frame)')
+
+        # 각 쿼리 포인트를 점으로 시각화 (마지막 프레임)
+        plt.scatter(last_ref_points[-1, :, 0].cpu().detach().numpy(), 
+                    last_ref_points[-1, :, 1].cpu().detach().numpy(), 
+                    c='b', label='Predicted Points (Last Frame)')
+
+        # 각 객체의 이동 경로 시각화
+        for i in range(last_ref_points.shape[1]):
+            plt.plot(last_ref_points[:, i, 0].cpu().detach().numpy(), 
+                    last_ref_points[:, i, 1].cpu().detach().numpy(), 
+                    c='gray', linestyle='--')
+
+        plt.title('Track Queries')
+        plt.xlabel('X')
+        plt.ylabel('Y')
+        plt.legend()
+
+        if self.save_counter % 50 == 0:
+            index = max([int(f.split('-')[-1].split('.')[0]) for f in os.listdir('/home/hyun/local_storage/code/UniAD/projects/mmdet3d_plugin/uniad/dense_heads/track_head-TrackFormer_Visualization/get_detections') if f.startswith('AIS3_Track_Queries-')] or [0]) + 1
+            plt.savefig(f'/home/hyun/local_storage/code/UniAD/projects/mmdet3d_plugin/uniad/dense_heads/track_head-TrackFormer_Visualization/get_detections/AIS3_Track_Queries-{index}.png')
+        plt.close()
+        self.save_counter += 1
+
+
+
+
 
 
 

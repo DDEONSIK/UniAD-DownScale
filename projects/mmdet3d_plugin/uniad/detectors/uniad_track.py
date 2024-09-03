@@ -62,7 +62,7 @@ class UniADTrack(MVXTwoStageDetector):
         ),
         pc_range=None,  # 포인트 클라우드 범위
         embed_dims=128,  # 임베딩 차원 수 #_ 원본: 256 / 수정: 128
-        num_query=900,  # 쿼리 수 #_500
+        num_query=500,  # 쿼리 수 #_500 #_ 원본: 900
         num_classes=10,  # 클래스 수
         vehicle_id_list=None,  # 차량 ID 리스트
         score_thresh=0.2,  # 점수 임계값
@@ -463,7 +463,7 @@ class UniADTrack(MVXTwoStageDetector):
         
         active_index = (track_instances.obj_idxes>=0) & (track_instances.iou >= self.gt_iou_threshold) & (track_instances.matched_gt_idxes >=0)
         out.update(self.select_active_track_query(track_instances, active_index, img_metas))
-        out.update(self.select_sdc_track_query(track_instances[900], img_metas)) #_500
+        out.update(self.select_sdc_track_query(track_instances[500], img_metas)) #_500 #_ 원본: 900
         
         # 메모리 뱅크
         if self.memory_bank is not None:
@@ -686,7 +686,7 @@ class UniADTrack(MVXTwoStageDetector):
         track_instances.output_embedding = query_feats[-1][0]  # [300, feat_dim]
         track_instances.ref_pts = last_ref_pts[0]
         # 하드코딩: 901번째 쿼리는 sdc 쿼리라고 가정
-        track_instances.obj_idxes[900] = -2 #_500
+        track_instances.obj_idxes[500] = -2 #_500 #_ 원본: 900
         """ 트랙 베이스 업데이트 """
         self.track_base.update(track_instances, None)
        
