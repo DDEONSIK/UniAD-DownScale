@@ -8,6 +8,8 @@ import numpy as np
 
 @BBOX_CODERS.register_module()
 class NMSFreeCoder(BaseBBoxCoder):
+    print("추적 UniAD/projects/mmdet3d_plugin/core/bbox/coders/nms_free_coder.py 지나감")
+
     """Bbox coder for NMS-free detector.
     Args:
         pc_range (list[float]): Range of point cloud.

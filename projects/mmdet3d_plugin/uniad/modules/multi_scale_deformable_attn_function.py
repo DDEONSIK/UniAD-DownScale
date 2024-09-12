@@ -9,6 +9,9 @@ from torch.cuda.amp import custom_bwd, custom_fwd
 from torch.autograd.function import Function, once_differentiable
 from mmcv.utils import ext_loader
 
+print("추적 UniAD/projects/mmdet3d_plugin/uniad/modules/multi_scale_deformable_attn_function.py 지나감")
+
+
 # 확장 모듈 로드
 ext_module = ext_loader.load_ext(
     '_ext', ['ms_deform_attn_backward', 'ms_deform_attn_forward'])
@@ -16,6 +19,8 @@ ext_module = ext_loader.load_ext(
 
 # MultiScaleDeformableAttnFunction_fp16 클래스 정의
 class MultiScaleDeformableAttnFunction_fp16(Function):
+    print("추적 UniAD/projects/mmdet3d_plugin/uniad/modules/multi_scale_deformable_attn_function.py MultiScaleDeformableAttnFunction_fp16 지나감")
+
 
     @staticmethod
     @custom_fwd(cast_inputs=torch.float16)
@@ -82,6 +87,8 @@ class MultiScaleDeformableAttnFunction_fp16(Function):
 
 # MultiScaleDeformableAttnFunction_fp32 클래스 정의
 class MultiScaleDeformableAttnFunction_fp32(Function):
+    print("추적 UniAD/projects/mmdet3d_plugin/uniad/modules/multi_scale_deformable_attn_function.py MultiScaleDeformableAttnFunction_fp32 지나감")
+
 
     @staticmethod
     @custom_fwd(cast_inputs=torch.float32)

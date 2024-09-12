@@ -2,6 +2,9 @@ import functools
 import time
 from collections import defaultdict
 import torch
+
+print("추적 UniAD/projects/mmdet3d_plugin/models/utils/bricks.py 지나감")
+
 time_maps = defaultdict(lambda :0.)
 count_maps = defaultdict(lambda :0.)
 def run_time(name):

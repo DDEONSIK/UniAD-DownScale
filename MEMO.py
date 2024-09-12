@@ -18,6 +18,22 @@ from mmdet3d.core.bbox.coders import build_bbox_coder
 print("\n")
 
 """
+Tracking 
+AMOTA↑ AMOTP↓ IDS↓
+ 
+Mapping  
+IoU-lane↑ IoU-road↑
+
+Motion Forecasting
+minADE↓ minFDE↓ MR↓ EPA↑
+
+Occupancy Prediction 
+IoU-n.↑ IoU-f.↑ VPQ-n.↑ VPQ-f.↑
+
+Planning 
+avg.L2↓ avg.Col.↓
+
+
 ps -ef | grep hyun
 kill -9 
 watch -d -n 0.5 nvidia-smi
@@ -45,6 +61,13 @@ disown -h
 ############ DV-1 재검증
 nohup ./tools/uniad_dist_train.sh ./projects/configs/stage1_track_map/base_track_map.py 3 > output.log 2>&1 &
 disown -h
+
+이름 메모: s/DV-1 2차 stage1_track_map/ba
+nohup ./tools/uniad_dist_eval.sh ./projects/configs/stage1_track_map/base_track_map.py ./projects/work_dirs/stage1_track_map/base_track_map/latest.pth 3 > output.log 2>&1 &
+-> 서버 사용 대기중
+
+
+
 
 
 #Visualization

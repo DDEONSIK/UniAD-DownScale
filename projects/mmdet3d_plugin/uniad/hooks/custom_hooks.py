@@ -3,7 +3,8 @@ from mmcv.runner.hooks.hook import HOOKS, Hook
 
 @HOOKS.register_module()
 class TransferWeight(Hook):
-    
+    print("추적 UniAD/projects/mmdet3d_plugin/uniad/hooks/custom_hooks.py 지나감")
+
     def __init__(self, every_n_inters=1):
         self.every_n_inters=every_n_inters
 

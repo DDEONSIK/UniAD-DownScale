@@ -4,6 +4,8 @@ import torch
 
 # 이미지 내의 인스턴스를 나타내는 클래스
 class Instances:
+    print("추적 UniAD/projects/mmdet3d_plugin/uniad/dense_heads/track_head_plugin/track_instance.py 지나감")
+
     """
     이미지 내의 인스턴스를 나타내는 클래스.
     인스턴스의 속성(e.g., boxes, masks, labels, scores)을 "fields"로 저장함.

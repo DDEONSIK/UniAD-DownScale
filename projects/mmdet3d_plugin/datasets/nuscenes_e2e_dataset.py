@@ -36,6 +36,8 @@ from nuscenes.prediction import convert_local_coords_to_global
 
 @DATASETS.register_module()
 class NuScenesE2EDataset(NuScenesDataset):
+    print("추적 UniAD/projects/mmdet3d_plugin/datasets/nuscenes_e2e_dataset.py 지나감")
+
     r"""NuScenes E2E Dataset.
 
     This dataset only add camera intrinsics and extrinsics to the results.

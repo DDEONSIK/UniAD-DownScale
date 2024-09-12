@@ -5,6 +5,8 @@ from projects.mmdet3d_plugin.core.bbox.util import denormalize_bbox
 
 # RuntimeTrackerBase 클래스 정의
 class RuntimeTrackerBase(object):
+    print("추적 UniAD/projects/mmdet3d_plugin/uniad/dense_heads/track_head_plugin/tracker.py 지나감")
+
     def __init__(self, score_thresh=0.5, filter_score_thresh=0.4, miss_tolerance=5):
         self.score_thresh = score_thresh  # 트랙을 유지하는 데 필요한 최소 점수
         self.filter_score_thresh = filter_score_thresh  # 트랙을 필터링하는 데 사용되는 점수

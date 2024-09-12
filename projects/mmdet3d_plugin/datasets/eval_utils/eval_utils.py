@@ -15,6 +15,9 @@ from nuscenes.eval.detection.data_classes import DetectionBox
 from nuscenes.eval.detection.data_classes import DetectionMetricData, DetectionMetricDataList, DetectionMetrics
 from nuscenes.eval.common.utils import center_distance, scale_iou, yaw_diff, velocity_l2, attr_acc, cummean
 
+print("추적 UniAD/projects/mmdet3d_plugin/datasets/eval_utils/eval_utils.py 지나감")
+
+
 def category_to_motion_name(category_name: str):
     """
     Default label mapping from nuScenes to nuScenes detection classes.

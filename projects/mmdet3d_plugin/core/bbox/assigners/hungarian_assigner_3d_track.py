@@ -12,6 +12,9 @@ except ImportError:
 
 @BBOX_ASSIGNERS.register_module()
 class HungarianAssigner3DTrack(BaseAssigner):
+
+    print("추적 UniAD/projects/mmdet3d_plugin/core/bbox/assigners/hungarian_assigner_3d_track.py 지나감")
+
     """Computes one-to-one matching between predictions and ground truth.
     This class computes an assignment between the targets and the predictions
     based on the costs. The costs are weighted sum of three components:

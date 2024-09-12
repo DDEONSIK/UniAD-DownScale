@@ -10,3 +10,5 @@ from .models.utils import *
 from .models.opt.adamw import AdamW2
 from .uniad import *
 from .losses import *
+
+print("추적 UniAD/projects/mmdet3d_plugin/__init__.py 지나감")

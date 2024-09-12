@@ -20,6 +20,8 @@ from .motion_head_plugin.base_motion_head import BaseMotionHead
 
 @HEADS.register_module()
 class MotionHead(BaseMotionHead):
+    print("추적 UniAD/projects/mmdet3d_plugin/uniad/dense_heads/motion_head.py 지나감")
+
     """
     MotionHead module for a neural network, which predicts motion trajectories and is used in an autonomous driving task.
 

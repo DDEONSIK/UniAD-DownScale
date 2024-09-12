@@ -13,6 +13,8 @@ from IPython import embed
 
 @SAMPLER.register_module()
 class DistributedGroupSampler(Sampler):
+    print("추적 UniAD/projects/mmdet3d_plugin/datasets/samplers/group_sampler.py 지나감")
+
     """Sampler that restricts data loading to a subset of the dataset.
     It is especially useful in conjunction with
     :class:`torch.nn.parallel.DistributedDataParallel`. In such case, each

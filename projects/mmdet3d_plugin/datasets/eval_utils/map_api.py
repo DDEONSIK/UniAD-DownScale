@@ -40,6 +40,8 @@ locations = ['singapore-onenorth', 'singapore-hollandvillage', 'singapore-queens
 
 
 class NuScenesMap:
+    print("추적 UniAD/projects/mmdet3d_plugin/datasets/eval_utils/map_api.py NuScenesMap 지나감")
+
     """
     NuScenesMap database class for querying and retrieving information from the semantic maps.
     Before using this class please use the provided tutorial `map_expansion_tutorial.ipynb`.
@@ -705,6 +707,8 @@ class NuScenesMap:
 
 
 class NuScenesMapExplorer:
+    print("추적 UniAD/projects/mmdet3d_plugin/datasets/eval_utils/map_api.py NuScenesMapExplorer 지나감")
+
     """ Helper class to explore the nuScenes map data. """
     def __init__(self,
                  map_api: NuScenesMap,

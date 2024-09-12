@@ -8,6 +8,8 @@ from mmcv.parallel import DataContainer as DC
 from mmdet.datasets.pipelines import to_tensor
 
 class NuScenesTraj(object):
+    print("추적 UniAD/projects/mmdet3d_plugin/datasets/data_utils/trajectory_api.py 지나감")
+
     def __init__(self,
                  nusc,
                  predict_steps,

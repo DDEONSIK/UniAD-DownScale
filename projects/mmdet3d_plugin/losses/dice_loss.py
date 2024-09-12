@@ -5,6 +5,9 @@ import torch.nn as nn
 from mmdet.models.losses.utils import weighted_loss
 from mmdet.models.builder import LOSSES
 
+print("추적 UniAD/projects/mmdet3d_plugin/losses/dice_loss.py 지나감")
+
+
 @weighted_loss
 def dice_loss(input, target,mask=None,eps=0.001):
     N,H,W = input.shape
@@ -23,6 +26,8 @@ def dice_loss(input, target,mask=None,eps=0.001):
 
 @LOSSES.register_module()
 class DiceLoss(nn.Module):
+    print("추적 UniAD/projects/mmdet3d_plugin/losses/dice_loss.py DiceLoss 지나감")
+
 
     def __init__(self, eps=1e-6, reduction='mean', loss_weight=1.0):
         super(DiceLoss, self).__init__()

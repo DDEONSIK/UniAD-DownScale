@@ -14,6 +14,8 @@ from mmdet.models import LOSSES
 
 @LOSSES.register_module()
 class TrajLoss(nn.Module):
+    print("추적 UniAD/projects/mmdet3d_plugin/losses/traj_loss.py TrajLoss 지나감")
+
     """
     MTP loss modified to include variances. Uses MSE for mode selection.
     Can also be used with
@@ -93,6 +95,9 @@ class TrajLoss(nn.Module):
 
         loss = l_class * self.cls_loss_weight + l_reg * self.nll_loss_weight + l_minade * self.loss_weight_minade + l_minfde * self.loss_weight_minfde
         return loss, l_class, l_reg, l_minade, l_minfde, l_mr
+
+print("추적 UniAD/projects/mmdet3d_plugin/losses/traj_loss.py 지나감")
+
 
 def min_ade(traj: torch.Tensor, traj_gt: torch.Tensor,
             masks: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:

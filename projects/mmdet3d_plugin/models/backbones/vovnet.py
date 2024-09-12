@@ -7,6 +7,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.nn.modules.batchnorm import _BatchNorm
 
+print("추적 UniAD/projects/mmdet3d_plugin/models/backbones/vovnet.py 지나감")
+
 
 VoVNet19_slim_dw_eSE = {
     'stem': [64, 64, 64],
@@ -154,6 +156,8 @@ def conv1x1(in_channels, out_channels, module_name, postfix, stride=1, groups=1,
 
 
 class Hsigmoid(nn.Module):
+    print("추적 UniAD/projects/mmdet3d_plugin/models/backbones/vovnet.py Hsigmoid 지나감")
+
     def __init__(self, inplace=True):
         super(Hsigmoid, self).__init__()
         self.inplace = inplace
@@ -163,6 +167,8 @@ class Hsigmoid(nn.Module):
 
 
 class eSEModule(nn.Module):
+    print("추적 UniAD/projects/mmdet3d_plugin/models/backbones/vovnet.py eSEModule 지나감")
+
     def __init__(self, channel, reduction=4):
         super(eSEModule, self).__init__()
         self.avg_pool = nn.AdaptiveAvgPool2d(1)
@@ -178,6 +184,8 @@ class eSEModule(nn.Module):
 
 
 class _OSA_module(nn.Module):
+    print("추적 UniAD/projects/mmdet3d_plugin/models/backbones/vovnet.py _OSA_module 지나감")
+
     def __init__(
         self, in_ch, stage_ch, concat_ch, layer_per_block, module_name, SE=False, identity=False, depthwise=False
     ):
@@ -231,6 +239,8 @@ class _OSA_module(nn.Module):
 
 
 class _OSA_stage(nn.Sequential):
+    print("추적 UniAD/projects/mmdet3d_plugin/models/backbones/vovnet.py _OSA_stage 지나감")
+
     def __init__(
         self, in_ch, stage_ch, concat_ch, block_per_stage, layer_per_block, stage_num, SE=False, depthwise=False
     ):
@@ -267,6 +277,8 @@ class _OSA_stage(nn.Sequential):
 
 @BACKBONES.register_module()
 class VoVNet(BaseModule):
+    print("추적 UniAD/projects/mmdet3d_plugin/models/backbones/vovnet.py VoVNet 지나감")
+
     def __init__(self, spec_name, input_ch=3, out_features=None, 
                  frozen_stages=-1, norm_eval=True, pretrained=None, init_cfg=None):
         """

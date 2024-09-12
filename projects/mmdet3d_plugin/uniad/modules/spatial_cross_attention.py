@@ -34,6 +34,9 @@ from mmcv.runner.base_module import BaseModule, ModuleList, Sequential
 from mmcv.utils import ext_loader
 from .multi_scale_deformable_attn_function import MultiScaleDeformableAttnFunction_fp32, \
     MultiScaleDeformableAttnFunction_fp16
+
+print("추적 UniAD/projects/mmdet3d_plugin/uniad/modules/spatial_cross_attention.py 지나감")
+
     
 #디버깅
 # from projects.mmdet3d_plugin.uniad.modules.multi_scale_deformable_attn_function import MultiScaleDeformableAttnFunction_fp32, MultiScaleDeformableAttnFunction_fp16
@@ -43,6 +46,8 @@ ext_module = ext_loader.load_ext(
 
 @ATTENTION.register_module() #아래 SpatialCrossAttention 클래스를 ATTENTION 레지스트리에 등록
 class SpatialCrossAttention(BaseModule): #BaseModule: 상속받을 부모 클래스. BaseModule기능 사용.
+    print("추적 UniAD/projects/mmdet3d_plugin/uniad/modules/spatial_cross_attention.py SpatialCrossAttention 지나감")
+
     """An attention module used in BEVFormer.
     Args:
         embed_dims (int): The embedding dimension of Attention.
@@ -223,6 +228,8 @@ class SpatialCrossAttention(BaseModule): #BaseModule: 상속받을 부모 클래
 
 @ATTENTION.register_module()
 class MSDeformableAttention3D(BaseModule):
+    print("추적 UniAD/projects/mmdet3d_plugin/uniad/modules/spatial_cross_attention.py MSDeformableAttention3D 지나감")
+
     """An attention module used in BEVFormer based on Deformable-Detr.
     `Deformable DETR: Deformable Transformers for End-to-End Object Detection.
     <https://arxiv.org/pdf/2010.04159.pdf>`_.

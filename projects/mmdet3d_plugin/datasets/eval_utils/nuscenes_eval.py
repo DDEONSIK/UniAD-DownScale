@@ -25,6 +25,8 @@ from nuscenes.utils.geometry_utils import view_points, BoxVisibility
 from nuscenes.utils.splits import create_splits_scenes
 from nuscenes.eval.detection.utils import category_to_detection_name
 
+print("추적 UniAD/projects/mmdet3d_plugin/datasets/eval_utils/nuscenes_eval.py 지나감")
+
 
 Axis = Any
 
@@ -92,6 +94,8 @@ def class_tp_curve(md_list: DetectionMetricDataList,
 
 
 class DetectionBox_modified(DetectionBox):
+    print("추적 UniAD/projects/mmdet3d_plugin/datasets/eval_utils/nuscenes_eval.py DetectionBox_modified 지나감")
+
     def __init__(self, *args, token=None, visibility=None, index=None, **kwargs):
         '''
         add annotation token
@@ -462,6 +466,8 @@ def filter_eval_boxes_by_overlap(nusc: NuScenes,
 
 
 class NuScenesEval_custom(NuScenesEval):
+    print("추적 UniAD/projects/mmdet3d_plugin/datasets/eval_utils/nuscenes_eval.py NuScenesEval_custom 지나감")
+
     """
     Dummy class for backward-compatibility. Same as DetectionEval.
     """

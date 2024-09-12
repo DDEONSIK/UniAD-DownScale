@@ -18,6 +18,8 @@ from mmdet.models.builder import HEADS, build_loss
 class SegDETRHead(
         AnchorFreeHead
 ):  # I modify DETRHead to make it to support panoptic segmentation
+    print("추적 UniAD/projects/mmdet3d_plugin/uniad/dense_heads/seg_head_plugin/seg_detr_head.py 지나감")
+
     """Implements the DETR transformer head.
 
     See `paper: End-to-End Object Detection with Transformers

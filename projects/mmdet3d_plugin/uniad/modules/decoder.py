@@ -27,6 +27,8 @@ from mmcv.utils import ext_loader
 from .multi_scale_deformable_attn_function import MultiScaleDeformableAttnFunction_fp32, \
     MultiScaleDeformableAttnFunction_fp16
 
+print("추적 UniAD/projects/mmdet3d_plugin/uniad/modules/decoder.py 지나감")
+
 ext_module = ext_loader.load_ext(
     '_ext', ['ms_deform_attn_backward', 'ms_deform_attn_forward'])
 
@@ -47,6 +49,8 @@ def inverse_sigmoid(x, eps=1e-5):
 
 @TRANSFORMER_LAYER_SEQUENCE.register_module()
 class DetectionTransformerDecoder(TransformerLayerSequence):
+    print("추적 UniAD/projects/mmdet3d_plugin/uniad/modules/decoder.py DetectionTransformerDecoder 지나감")
+
     """DETR3D transformer에서 디코더를 구현.
     Args:
         return_intermediate (bool): 중간 출력을 반환할지 여부.
@@ -117,6 +121,8 @@ class DetectionTransformerDecoder(TransformerLayerSequence):
 
 @ATTENTION.register_module()
 class CustomMSDeformableAttention(BaseModule):
+    print("추적 UniAD/projects/mmdet3d_plugin/uniad/modules/decoder.py CustomMSDeformableAttention 지나감")
+
     """Deformable-Detr에서 사용되는 attention 모듈.
     `Deformable DETR: Deformable Transformers for End-to-End Object Detection.
     <https://arxiv.org/pdf/2010.04159.pdf>`_.

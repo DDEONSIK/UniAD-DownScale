@@ -3,6 +3,9 @@ import math
 import numpy as np
 from typing import List, Dict, Tuple, Callable, Union
 
+print("추적 UniAD/projects/mmdet3d_plugin/datasets/eval_utils/metric_utils.py 지나감")
+
+
 def min_ade(traj: torch.Tensor, traj_gt: torch.Tensor,
             masks: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
     """

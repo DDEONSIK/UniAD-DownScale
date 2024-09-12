@@ -4,6 +4,8 @@ from projects.mmdet3d_plugin.models.utils import run_time
 
 @HOOKS.register_module()
 class GradChecker(Hook):
+    print("추적 UniAD/projects/mmdet3d_plugin/models/hooks/hooks.py 지나감")
+
 
     def after_train_iter(self, runner):
         for key, val in runner.model.named_parameters():

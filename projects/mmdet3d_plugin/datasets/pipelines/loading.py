@@ -7,6 +7,8 @@ import os
 
 @PIPELINES.register_module()
 class LoadMultiViewImageFromFilesInCeph(object):
+    print("추적 UniAD/projects/mmdet3d_plugin/datasets/pipelines/loading.py LoadMultiViewImageFromFilesInCeph 지나감")
+
     """Load multi channel images from a list of separate channel files.
 
     Expects results['img_filename'] to be a list of filenames.
@@ -84,6 +86,8 @@ class LoadMultiViewImageFromFilesInCeph(object):
 
 @PIPELINES.register_module()
 class LoadAnnotations3D_E2E(LoadAnnotations3D):
+    print("추적 UniAD/projects/mmdet3d_plugin/datasets/pipelines/loading.py LoadAnnotations3D_E2E 지나감")
+
     """Load Annotations3D.
 
     Load instance mask and semantic mask of points and

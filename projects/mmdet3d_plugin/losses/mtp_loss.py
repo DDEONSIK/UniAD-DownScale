@@ -14,6 +14,8 @@ from mmdet.models import LOSSES
 
 @LOSSES.register_module()
 class MTPLoss(nn.Module):
+    print("추적 UniAD/projects/mmdet3d_plugin/losses/mtp_loss.py MTPLoss 지나감")
+
     """
     MTP loss modified to include variances. Uses MSE for mode selection.
     Can also be used with
@@ -85,6 +87,9 @@ class MTPLoss(nn.Module):
         l_class = torch.sum(l_class)/(batch_size + 1e-5) * self.loss_weight
         l_mindae = torch.sum(errs)/(batch_size + 1e-5)
         return loss, l_class, l_reg, l_mindae
+
+print("추적 UniAD/projects/mmdet3d_plugin/losses/mtp_loss.py 지나감")
+
 
 def min_ade(traj: torch.Tensor, traj_gt: torch.Tensor,
             masks: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:

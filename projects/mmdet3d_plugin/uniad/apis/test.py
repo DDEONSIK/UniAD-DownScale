@@ -17,6 +17,9 @@ import mmcv
 import numpy as np
 import pycocotools.mask as mask_util
 
+print("추적 UniAD/projects/mmdet3d_plugin/uniad/apis/test.py 지나감")
+
+
 def custom_encode_mask_results(mask_results):
     """Encode bitmap mask to RLE code. Semantic Masks only
     Args:

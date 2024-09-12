@@ -1,3 +1,6 @@
+
+print("추적 UniAD/projects/configs/_base_/datasets/nus-3d.py 지나감")
+
 # If point cloud range is changed, the models should also change their point
 # cloud range accordingly
 point_cloud_range = [-50, -50, -5, 50, 50, 3]

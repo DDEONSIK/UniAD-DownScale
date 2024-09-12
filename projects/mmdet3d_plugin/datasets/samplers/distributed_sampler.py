@@ -7,6 +7,8 @@ from .sampler import SAMPLER
 
 @SAMPLER.register_module()
 class DistributedSampler(_DistributedSampler):
+    print("추적 UniAD/projects/mmdet3d_plugin/datasets/samplers/distributed_sampler.py 지나감")
+
 
     def __init__(self,
                  dataset=None,

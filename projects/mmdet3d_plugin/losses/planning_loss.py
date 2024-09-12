@@ -14,6 +14,8 @@ from mmdet.models import LOSSES
 
 @LOSSES.register_module()
 class PlanningLoss(nn.Module):
+    print("추적 UniAD/projects/mmdet3d_plugin/losses/planning_loss.py PlanningLoss 지나감")
+
     def __init__(self, loss_type='L2'):
         super(PlanningLoss, self).__init__()
         self.loss_type = loss_type
@@ -28,6 +30,8 @@ class PlanningLoss(nn.Module):
 
 @LOSSES.register_module()
 class CollisionLoss(nn.Module):
+    print("추적 UniAD/projects/mmdet3d_plugin/losses/planning_loss.py CollisionLoss 지나감")
+
     def __init__(self, delta=0.5, weight=1.0):
         super(CollisionLoss, self).__init__()
         self.w = 1.85 + delta

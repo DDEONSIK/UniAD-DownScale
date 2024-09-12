@@ -21,6 +21,8 @@ def _get_clones(module, N):
 
 @HEADS.register_module()
 class OccHead(BaseModule):
+    print("추적 UniAD/projects/mmdet3d_plugin/uniad/dense_heads/occ_head.py 지나감")
+
     def __init__(self, 
                  # General
                  receptive_field=3,

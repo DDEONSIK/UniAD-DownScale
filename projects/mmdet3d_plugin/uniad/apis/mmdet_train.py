@@ -22,6 +22,10 @@ import os.path as osp
 from projects.mmdet3d_plugin.datasets.builder import build_dataloader
 from projects.mmdet3d_plugin.core.evaluation.eval_hooks import CustomDistEvalHook
 from projects.mmdet3d_plugin.datasets import custom_build_dataset
+
+print("추적 UniAD/projects/mmdet3d_plugin/uniad/apis/mmdet_train.py 지나감")
+
+
 def custom_train_detector(model,
                    dataset,
                    cfg,

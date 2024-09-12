@@ -2,6 +2,9 @@ import math
 import torch
 from einops import rearrange, repeat
 
+print("추적 UniAD/projects/mmdet3d_plugin/models/utils/functional.py 지나감")
+
+
 def bivariate_gaussian_activation(ip):
     """
     Activation function to output parameters of bivariate Gaussian distribution.

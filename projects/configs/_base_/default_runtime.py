@@ -1,3 +1,6 @@
+
+print("추적 UniAD/projects/configs/_base_/default_runtime.py 지나감")
+
 checkpoint_config = dict(interval=1)
 # yapf:disable push
 # By default we use textlogger hook and tensorboard

@@ -12,10 +12,15 @@ from mmdet.models.utils.builder import TRANSFORMER
 import math
 from mmcv.runner import force_fp32
 
+print("추적 UniAD/projects/mmdet3d_plugin/uniad/dense_heads/seg_head_plugin/seg_mask_head.py 지나감")
+
+
 count = 0
 
 
 class Mlp(nn.Module):
+    print("추적 UniAD/projects/mmdet3d_plugin/uniad/dense_heads/seg_head_plugin/seg_mask_head.py Mlp 지나감")
+
     def __init__(self,
                  in_features,
                  hidden_features=None,
@@ -43,6 +48,8 @@ class Mlp(nn.Module):
 
 
 class SelfAttention(nn.Module):
+    print("추적 UniAD/projects/mmdet3d_plugin/uniad/dense_heads/seg_head_plugin/seg_mask_head.py SelfAttention 지나감")
+
     def __init__(self,
                  cfg,
                  dim,
@@ -84,6 +91,8 @@ class SelfAttention(nn.Module):
 
 
 class Attention(nn.Module):
+    print("추적 UniAD/projects/mmdet3d_plugin/uniad/dense_heads/seg_head_plugin/seg_mask_head.py Attention 지나감")
+
     def __init__(self,
                  cfg,
                  dim,
@@ -156,6 +165,8 @@ class Attention(nn.Module):
 
 # AttentionTail is a cheap implementation that can make mask decoder 1 layer deeper.
 class AttentionTail(nn.Module): 
+    print("추적 UniAD/projects/mmdet3d_plugin/uniad/dense_heads/seg_head_plugin/seg_mask_head.py AttentionTail 지나감")
+
     def __init__(self,
                  cfg,
                  dim,
@@ -212,6 +223,8 @@ class AttentionTail(nn.Module):
 
 
 class Block(nn.Module):
+    print("추적 UniAD/projects/mmdet3d_plugin/uniad/dense_heads/seg_head_plugin/seg_mask_head.py Block 지나감")
+
     def __init__(self,
                  cfg,
                  dim,
@@ -295,6 +308,8 @@ def _get_clones(module, N):
 
 
 class DropPath(nn.Module):
+    print("추적 UniAD/projects/mmdet3d_plugin/uniad/dense_heads/seg_head_plugin/seg_mask_head.py DropPath 지나감")
+
     """Drop paths (Stochastic Depth) per sample  (when applied in main path of residual blocks).
     """
     def __init__(self, drop_prob=None):
@@ -308,6 +323,8 @@ class DropPath(nn.Module):
 
 @TRANSFORMER.register_module()
 class SegMaskHead(nn.Module):
+    print("추적 UniAD/projects/mmdet3d_plugin/uniad/dense_heads/seg_head_plugin/seg_mask_head.py SegMaskHead 지나감")
+
     def __init__(self,
                  cfg=None,
                  d_model=16,

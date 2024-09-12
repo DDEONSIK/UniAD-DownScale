@@ -5,6 +5,9 @@ from .traj_loss import TrajLoss
 from .planning_loss import PlanningLoss, CollisionLoss
 from .dice_loss import DiceLoss
 
+print("추적 UniAD/projects/mmdet3d_plugin/losses/__init__.py 지나감")
+
+
 __all__ = [
     'ClipMatcher', 'MTPLoss',
     'DiceLoss',

@@ -8,6 +8,8 @@ from .track_instance import Instances
 
 # MemoryBank 클래스 정의 - 메모리 뱅크 관련 기능을 담당하는 클래스
 class MemoryBank(nn.Module):  # QIM, TAN 관련
+    print("추적 UniAD/projects/mmdet3d_plugin/uniad/dense_heads/track_head_plugin/modules.py MemoryBank 지나감")
+
     def __init__(self, args, dim_in, hidden_dim, dim_out):
         super().__init__()
         self._build_layers(args, dim_in, hidden_dim, dim_out)
@@ -172,6 +174,8 @@ class MemoryBank(nn.Module):  # QIM, TAN 관련
 
 #QIM # MOTR: End-to-End Multiple-Object Tracking with Transformer
 class QueryInteractionBase(nn.Module):
+    print("추적 UniAD/projects/mmdet3d_plugin/uniad/dense_heads/track_head_plugin/modules.py QueryInteractionBase 지나감")
+
 
     def __init__(self, args, dim_in, hidden_dim, dim_out):
         super().__init__()
@@ -196,6 +200,7 @@ class QueryInteractionBase(nn.Module):
 # QueryInteractionModule 클래스 정의 - 객체 상호작용 모듈
 class QueryInteractionModule(QueryInteractionBase):  # Query Interaction Module #객체 출입 처리
 # 신생 객체는 Detection Queries를 통해 추가, 사라진 객체는 Track Queries를 통해 제거
+    print("추적 UniAD/projects/mmdet3d_plugin/uniad/dense_heads/track_head_plugin/modules.py QueryInteractionModule 지나감")
 
     def __init__(self, args, dim_in, hidden_dim, dim_out):
         super().__init__(args, dim_in, hidden_dim, dim_out)

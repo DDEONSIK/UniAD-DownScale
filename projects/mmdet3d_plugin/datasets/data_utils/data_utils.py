@@ -4,6 +4,7 @@ from nuscenes.eval.common.utils import quaternion_yaw, Quaternion
 from nuscenes.utils.data_classes import Box as NuScenesBox
 import pyquaternion
 
+print("추적 UniAD/projects/mmdet3d_plugin/datasets/data_utils/data_utils.py 지나감")
 
 def output_to_nusc_box(detection):
     """Convert the output to the box class in the nuScenes.

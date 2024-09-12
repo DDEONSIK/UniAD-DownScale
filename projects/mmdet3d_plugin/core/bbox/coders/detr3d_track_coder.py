@@ -8,6 +8,8 @@ from mmcv.ops import nms_bev
 
 @BBOX_CODERS.register_module()
 class DETRTrack3DCoder(BaseBBoxCoder):
+    print("추적 UniAD/projects/mmdet3d_plugin/core/bbox/coders/detr3d_track_coder.py 지나감")
+
     """Bbox coder for DETR3D.
     Args:
         pc_range (list[float]): Range of point cloud.

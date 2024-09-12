@@ -19,6 +19,8 @@ from mmcv.cnn.bricks.transformer import build_feedforward_network, build_attenti
 
 @TRANSFORMER_LAYER.register_module()
 class MyCustomBaseTransformerLayer(BaseModule):
+    print("추적 UniAD/projects/mmdet3d_plugin/uniad/modules/custom_base_transformer_layer.py 지나감")
+
     """Base `TransformerLayer` for vision transformer.
     It can be built from `mmcv.ConfigDict` and support more flexible
     customization, for example, using any number of `FFN or LN ` and

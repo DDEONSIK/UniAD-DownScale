@@ -27,6 +27,8 @@ import numpy as np
 
 @HEADS.register_module()
 class BEVFormerTrackHead(DETRHead):
+    print("추적 UniAD/projects/mmdet3d_plugin/uniad/dense_heads/track_head.py 지나감")
+
     """Head of Detr3D.
     Args:
         with_box_refine (bool): Whether to refine the reference points
@@ -39,7 +41,7 @@ class BEVFormerTrackHead(DETRHead):
     """
     
     # 클래스 변수로 save_counter 선언
-    #시각화 저장 횟수를 관리하기 위한 카운터 추가
+    # 시각화 저장 횟수를 관리하기 위한 카운터 추가
     save_counter = 0
 
     def __init__(self, # 필요한 매개변수와 변수 설정 # 부모 클래스 DETRHead 초기화

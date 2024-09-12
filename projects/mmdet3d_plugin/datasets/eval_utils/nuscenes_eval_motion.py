@@ -74,6 +74,8 @@ TP_METRICS = [
 TP_TRAJ_METRICS = ['min_ade_err', 'min_fde_err', 'miss_rate_err']
 Axis = Any
 
+print("추적 UniAD/projects/mmdet3d_plugin/datasets/eval_utils/nuscenes_eval_motion.py 지나감")
+
 
 def class_tp_curve(md_list: DetectionMetricDataList,
                    metrics: DetectionMetrics,

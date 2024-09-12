@@ -1,3 +1,6 @@
+
+print("추적 UniAD/projects/configs/stage2_e2e/base_e2e.py 지나감")
+
 _base_ = ["../_base_/datasets/nus-3d.py",
           "../_base_/default_runtime.py"]
 

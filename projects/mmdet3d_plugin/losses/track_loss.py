@@ -24,6 +24,8 @@ from mmdet3d.core.bbox.iou_calculators.iou3d_calculator import (
     bbox_overlaps_nearest_3d as iou_3d, )
 from projects.mmdet3d_plugin.core.bbox.util import denormalize_bbox
 
+print("추적 UniAD/projects/mmdet3d_plugin/losses/track_loss.py 지나감")
+
 
 def is_dist_avail_and_initialized():
     if not dist.is_available():
@@ -60,6 +62,8 @@ def accuracy(output, target, topk=(1, )):
 
 @LOSSES.register_module()
 class ClipMatcher(nn.Module):
+    print("추적 UniAD/projects/mmdet3d_plugin/losses/track_loss.py ClipMatcher 지나감")
+
     def __init__(
             self,
             num_classes,

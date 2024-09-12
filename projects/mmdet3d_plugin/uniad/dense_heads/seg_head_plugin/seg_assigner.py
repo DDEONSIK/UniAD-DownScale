@@ -18,11 +18,15 @@ import torch
 
 from mmdet.utils import util_mixins
 
+print("추적 UniAD/projects/mmdet3d_plugin/uniad/dense_heads/seg_head_plugin/seg_assigner.py 지나감")
+
 
 INF = 10000000
 
 
 class SamplingResult_segformer(util_mixins.NiceRepr):
+    print("추적 UniAD/projects/mmdet3d_plugin/uniad/dense_heads/seg_head_plugin/seg_assigner.py SamplingResult_segformer 지나감")
+
     """
     """
 
@@ -167,6 +171,8 @@ class SamplingResult_segformer(util_mixins.NiceRepr):
 
 @BBOX_SAMPLERS.register_module()
 class PseudoSampler_segformer(BaseSampler):
+    print("추적 UniAD/projects/mmdet3d_plugin/uniad/dense_heads/seg_head_plugin/seg_assigner.py PseudoSampler_segformer 지나감")
+
     """A pseudo sampler that does not do sampling actually."""
 
     def __init__(self, **kwargs):
@@ -203,6 +209,8 @@ class PseudoSampler_segformer(BaseSampler):
 
 @BBOX_ASSIGNERS.register_module()
 class HungarianAssigner_filter(BaseAssigner):
+    print("추적 UniAD/projects/mmdet3d_plugin/uniad/dense_heads/seg_head_plugin/seg_assigner.py HungarianAssigner_filter 지나감")
+
     """
     """
 
@@ -302,6 +310,8 @@ class HungarianAssigner_filter(BaseAssigner):
 
 @BBOX_ASSIGNERS.register_module()
 class HungarianAssigner_multi_info(BaseAssigner):
+    print("추적 UniAD/projects/mmdet3d_plugin/uniad/dense_heads/seg_head_plugin/seg_assigner.py HungarianAssigner_multi_info 지나감")
+
     """Computes one-to-one matching between predictions and ground truth.
 
     This class computes an assignment between the targets and the predictions

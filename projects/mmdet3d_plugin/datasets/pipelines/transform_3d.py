@@ -8,6 +8,8 @@ from mmdet3d.core.bbox import CameraInstance3DBoxes, DepthInstance3DBoxes, LiDAR
 
 @PIPELINES.register_module()
 class PadMultiViewImage(object):
+    print("추적 UniAD/projects/mmdet3d_plugin/datasets/pipelines/transform_3d.py PadMultiViewImage 지나감")
+
     """Pad the multi-view image.
     There are two padding modes: (1) pad to a fixed size and (2) pad to the
     minimum size that is divisible by some number.
@@ -62,6 +64,8 @@ class PadMultiViewImage(object):
 
 @PIPELINES.register_module()
 class NormalizeMultiviewImage(object):
+    print("추적 UniAD/projects/mmdet3d_plugin/datasets/pipelines/transform_3d.py NormalizeMultiviewImage 지나감")
+
     """Normalize the image.
     Added key is "img_norm_cfg".
     Args:
@@ -99,6 +103,8 @@ class NormalizeMultiviewImage(object):
 
 @PIPELINES.register_module()
 class PhotoMetricDistortionMultiViewImage:
+    print("추적 UniAD/projects/mmdet3d_plugin/datasets/pipelines/transform_3d.py PhotoMetricDistortionMultiViewImage 지나감")
+
     """Apply photometric distortion to image sequentially, every transformation
     is applied with a probability of 0.5. The position of random contrast is in
     second or second to last.
@@ -200,6 +206,8 @@ class PhotoMetricDistortionMultiViewImage:
 
 @PIPELINES.register_module()
 class CustomCollect3D(object):
+    print("추적 UniAD/projects/mmdet3d_plugin/datasets/pipelines/transform_3d.py CustomCollect3D 지나감")
+
     """Collect data from the loader relevant to the specific task.
     This is usually the last stage of the data loader pipeline. Typically keys
     is set to some subset of "img", "proposals", "gt_bboxes",
@@ -288,6 +296,8 @@ class CustomCollect3D(object):
 
 @PIPELINES.register_module()
 class RandomScaleImageMultiViewImage(object):
+    print("추적 UniAD/projects/mmdet3d_plugin/datasets/pipelines/transform_3d.py RandomScaleImageMultiViewImage 지나감")
+
     """Random scale the image
     Args:
         scales
@@ -329,6 +339,8 @@ class RandomScaleImageMultiViewImage(object):
 
 @PIPELINES.register_module()
 class ObjectRangeFilterTrack(object):
+    print("추적 UniAD/projects/mmdet3d_plugin/datasets/pipelines/transform_3d.py ObjectRangeFilterTrack 지나감")
+
     """Filter objects by the range.
     Args:
         point_cloud_range (list[float]): Point cloud range.
@@ -409,6 +421,8 @@ class ObjectRangeFilterTrack(object):
 
 @PIPELINES.register_module()
 class ObjectNameFilterTrack(object):
+    print("추적 UniAD/projects/mmdet3d_plugin/datasets/pipelines/transform_3d.py ObjectNameFilterTrack 지나감")
+
     """Filter GT objects by their names.
     Args:
         classes (list[str]): List of class names to be kept for training.
@@ -446,6 +460,8 @@ class ObjectNameFilterTrack(object):
 
 @PIPELINES.register_module()
 class CustomObjectRangeFilter(ObjectRangeFilter):
+    print("추적 UniAD/projects/mmdet3d_plugin/datasets/pipelines/transform_3d.py CustomObjectRangeFilter 지나감")
+
     def __call__(self, results):
         """Call function to filter objects by the range.
         Args:
@@ -481,6 +497,8 @@ class CustomObjectRangeFilter(ObjectRangeFilter):
 
 @PIPELINES.register_module()
 class CustomObjectNameFilter(ObjectNameFilter):
+    print("추적 UniAD/projects/mmdet3d_plugin/datasets/pipelines/transform_3d.py 지나감")
+
     def __call__(self, results):
         """Call function to filter objects by their names.
         Args:

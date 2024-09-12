@@ -13,6 +13,8 @@ from mmcv.runner import EvalHook as BaseEvalHook
 from torch.nn.modules.batchnorm import _BatchNorm
 from mmdet.core.evaluation.eval_hooks import DistEvalHook
 
+print("추적 UniAD/projects/mmdet3d_plugin/core/evaluation/eval_hooks.py 지나감")
+
 
 def _calc_dynamic_intervals(start_interval, dynamic_interval_list):
     assert mmcv.is_list_of(dynamic_interval_list, tuple)
@@ -27,6 +29,8 @@ def _calc_dynamic_intervals(start_interval, dynamic_interval_list):
 
 
 class CustomDistEvalHook(BaseDistEvalHook):
+    print("추적 UniAD/projects/mmdet3d_plugin/core/evaluation/eval_hooks.py CustomDistEvalHook 지나감")
+
 
     def __init__(self, *args, dynamic_intervals=None,  **kwargs):
         super(CustomDistEvalHook, self).__init__(*args, **kwargs)

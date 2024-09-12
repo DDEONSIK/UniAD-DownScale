@@ -13,6 +13,8 @@ from mmdet.models.losses.utils import weight_reduce_loss
 
 @LOSSES.register_module()
 class FieryBinarySegmentationLoss(nn.Module):
+    print("추적 UniAD/projects/mmdet3d_plugin/losses/occflow_loss.py FieryBinarySegmentationLoss 지나감")
+
     def __init__(self, use_top_k=False, top_k_ratio=1.0, future_discount=1.0, loss_weight=1.0, ignore_index=255):
         super().__init__()
         self.use_top_k = use_top_k
@@ -62,6 +64,9 @@ class FieryBinarySegmentationLoss(nn.Module):
 
         return self.loss_weight * torch.mean(loss)
         
+print("추적 UniAD/projects/mmdet3d_plugin/losses/occflow_loss.py 지나감")
+
+
 def dice_loss(pred,
               target,
               weight=None,

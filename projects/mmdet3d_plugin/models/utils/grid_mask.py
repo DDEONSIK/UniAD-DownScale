@@ -5,6 +5,8 @@ from PIL import Image
 from mmcv.runner import force_fp32, auto_fp16
 
 class Grid(object):
+    print("추적 UniAD/projects/mmdet3d_plugin/models/utils/grid_mask.py Grid 지나감")
+
     def __init__(self, use_h, use_w, rotate = 1, offset=False, ratio = 0.5, mode=0, prob = 1.):
         self.use_h = use_h
         self.use_w = use_w
@@ -68,6 +70,8 @@ class Grid(object):
 
 
 class GridMask(nn.Module):
+    print("추적 UniAD/projects/mmdet3d_plugin/models/utils/grid_mask.py GridMask 지나감")
+
     def __init__(self, use_h, use_w, rotate = 1, offset=False, ratio = 0.5, mode=0, prob = 1.):
         super(GridMask, self).__init__()
         self.use_h = use_h

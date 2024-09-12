@@ -22,6 +22,8 @@ from .seg_head_plugin import SegDETRHead, IOU
 
 @HEADS.register_module()
 class PansegformerHead(SegDETRHead):
+    print("추적 UniAD/projects/mmdet3d_plugin/uniad/dense_heads/panseg_head.py 지나감")
+
     """
     Head of Panoptic SegFormer
 

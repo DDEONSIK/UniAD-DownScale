@@ -9,6 +9,8 @@ import os
 
 @PIPELINES.register_module()
 class GenerateOccFlowLabels(object):
+    print("추적 UniAD/projects/mmdet3d_plugin/datasets/pipelines/occflow_label.py 지나감")
+
     def __init__(self, grid_conf, ignore_index=255, only_vehicle=True, filter_invisible=True, deal_instance_255=False):
         self.grid_conf = grid_conf
         self.bev_resolution, self.bev_start_position, self.bev_dimension = calculate_birds_eye_view_parameters(

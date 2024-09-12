@@ -18,12 +18,17 @@ import cv2 as cv
 import mmcv
 from mmcv.utils import TORCH_VERSION, digit_version
 from mmcv.utils import ext_loader
+
+print("추적 UniAD/projects/mmdet3d_plugin/uniad/modules/encoder.py 지나감")
+
 ext_module = ext_loader.load_ext(
     '_ext', ['ms_deform_attn_backward', 'ms_deform_attn_forward'])
 
 
 @TRANSFORMER_LAYER_SEQUENCE.register_module()
 class BEVFormerEncoder(TransformerLayerSequence):
+    print("추적 UniAD/projects/mmdet3d_plugin/uniad/modules/encoder.py BEVFormerEncoder 지나감")
+
     """
     Attention with both self and cross
     Implements the decoder in DETR transformer.
@@ -228,6 +233,8 @@ class BEVFormerEncoder(TransformerLayerSequence):
 
 @TRANSFORMER_LAYER.register_module()
 class BEVFormerLayer(MyCustomBaseTransformerLayer):
+    print("추적 UniAD/projects/mmdet3d_plugin/uniad/modules/encoder.py BEVFormerLayer 지나감")
+
     """DETR transformer에서 디코더 레이어를 구현합니다.
     Args:
         attn_cfgs (list[`mmcv.ConfigDict`] | list[dict] | dict )):

@@ -5,6 +5,9 @@ from .formating import CustomDefaultFormatBundle3D
 from .loading import LoadAnnotations3D_E2E  # TODO: remove LoadAnnotations3D_E2E to other file
 from .occflow_label import GenerateOccFlowLabels
 
+print("추적 UniAD/projects/mmdet3d_plugin/datasets/pipelines/__init__.py 지나감")
+
+
 __all__ = [
     'PadMultiViewImage', 'NormalizeMultiviewImage', 
     'PhotoMetricDistortionMultiViewImage', 'CustomDefaultFormatBundle3D', 'CustomCollect3D', 'RandomScaleImageMultiViewImage',

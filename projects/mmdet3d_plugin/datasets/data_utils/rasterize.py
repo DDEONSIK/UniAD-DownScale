@@ -3,6 +3,8 @@ import numpy as np
 from shapely import affinity
 from shapely.geometry import LineString, box
 
+print("추적 UniAD/projects/mmdet3d_plugin/datasets/data_utils/rasterize.py 지나감")
+
 
 def get_patch_coord(patch_box, patch_angle=0.0):
     patch_x, patch_y, patch_h, patch_w = patch_box

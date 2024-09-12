@@ -13,6 +13,8 @@ CLASS2LABEL = {
 }
 
 class VectorizedLocalMap(object):
+    print("추적 UniAD/projects/mmdet3d_plugin/datasets/data_utils/vector_map.py 지나감")
+
     def __init__(self,
                  dataroot,
                  patch_size,

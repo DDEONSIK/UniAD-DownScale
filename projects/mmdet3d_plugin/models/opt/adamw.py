@@ -9,6 +9,8 @@ from mmcv.runner.optimizer.builder import OPTIMIZERS
 
 @OPTIMIZERS.register_module()
 class AdamW2(Optimizer):
+    print("추적 UniAD/projects/mmdet3d_plugin/models/opt/adamw.py 지나감")
+
     r"""Implements AdamW algorithm. Solve the bug of torch 1.8
 
     The original Adam algorithm was proposed in `Adam: A Method for Stochastic Optimization`_.

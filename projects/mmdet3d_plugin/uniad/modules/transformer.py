@@ -22,6 +22,8 @@ from mmcv.runner import force_fp32, auto_fp16
 
 @TRANSFORMER.register_module()
 class PerceptionTransformer(BaseModule):
+    print("추적 UniAD/projects/mmdet3d_plugin/uniad/modules/transformer.py 지나감")
+
     """Implements the Detr3D transformer.
     Args:
         as_two_stage (bool): Generate query from encoder features.

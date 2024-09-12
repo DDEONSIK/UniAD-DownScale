@@ -26,6 +26,8 @@ from ..dense_heads.track_head_plugin import MemoryBank, QueryInteractionModule, 
 @DETECTORS.register_module()
 # @DETECTORS.register_module(force=True) # 기존 항목 덮어쓰기 #디버깅
 class UniADTrack(MVXTwoStageDetector):
+    print("추적 UniAD/projects/mmdet3d_plugin/uniad/detectors/uniad_track.py 지나감")
+
     """UniAD 추적 부분"""
     def __init__(
         self, 

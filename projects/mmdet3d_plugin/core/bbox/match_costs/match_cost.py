@@ -5,6 +5,8 @@ import torch.nn.functional as F
 
 @MATCH_COST.register_module()
 class BBox3DL1Cost(object):
+    print("추적 UniAD/projects/mmdet3d_plugin/core/bbox/match_costs/match_cost.py BBox3DL1Cost 지나감")
+
     """BBox3DL1Cost.
      Args:
          weight (int | float, optional): loss_weight
@@ -30,6 +32,7 @@ class BBox3DL1Cost(object):
 
 @MATCH_COST.register_module()
 class DiceCost(object):
+    print("추적 UniAD/projects/mmdet3d_plugin/core/bbox/match_costs/match_cost.py DiceCost 지나감")
     """IoUCost.
 
      Args:

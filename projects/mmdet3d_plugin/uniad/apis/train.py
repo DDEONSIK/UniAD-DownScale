@@ -2,6 +2,9 @@ from .mmdet_train import custom_train_detector
 from mmseg.apis import train_segmentor
 from mmdet.apis import train_detector
 
+print("추적 UniAD/projects/mmdet3d_plugin/uniad/apis/train.py 지나감")
+
+
 def custom_train_model(model,
                 dataset,
                 cfg,

@@ -17,12 +17,18 @@ from mmcv.utils import (ConfigDict, build_from_cfg, deprecated_api_warning,
                         to_2tuple)
 
 from mmcv.utils import ext_loader
+
+print("추적 UniAD/projects/mmdet3d_plugin/uniad/modules/temporal_self_attention.py 지나감")
+
+
 ext_module = ext_loader.load_ext(
     '_ext', ['ms_deform_attn_backward', 'ms_deform_attn_forward'])
 
 
 @ATTENTION.register_module()
 class TemporalSelfAttention(BaseModule):
+    print("추적 UniAD/projects/mmdet3d_plugin/uniad/modules/temporal_self_attention.py TemporalSelfAttention 지나감")
+
     """An attention module used in BEVFormer based on Deformable-Detr.
 
     `Deformable DETR: Deformable Transformers for End-to-End Object Detection.

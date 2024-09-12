@@ -26,6 +26,8 @@ from einops.layers.torch import Rearrange
 # Copy-paste from defromable detr in mmdet.
 @TRANSFORMER.register_module()
 class SegDeformableTransformer(Transformer):
+    print("추적 UniAD/projects/mmdet3d_plugin/uniad/dense_heads/seg_head_plugin/seg_deformable_transformer.py 지나감")
+
     """Implements the DeformableDETR transformer.
 
     Args:

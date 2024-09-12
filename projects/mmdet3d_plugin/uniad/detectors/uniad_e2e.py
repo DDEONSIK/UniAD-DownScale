@@ -13,8 +13,13 @@ from ..dense_heads.seg_head_plugin import IOU
 from .uniad_track import UniADTrack
 from mmdet.models.builder import build_head
 
+print("추적 UniAD/projects/mmdet3d_plugin/uniad/detectors/uniad_e2e.py 지나감")
+
+
 @DETECTORS.register_module()
 class UniAD(UniADTrack):
+    print("추적 UniAD/projects/mmdet3d_plugin/uniad/detectors/uniad_e2e.py UniAD 지나감")
+
     """
     UniAD: Unifying Detection, Tracking, Segmentation, Motion Forecasting, Occupancy Prediction and Planning for Autonomous Driving
     """

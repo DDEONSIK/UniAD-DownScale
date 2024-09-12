@@ -15,6 +15,8 @@ import copy
 
 @HEADS.register_module()
 class PlanningHeadSingleMode(nn.Module):
+    print("추적 UniAD/projects/mmdet3d_plugin/uniad/dense_heads/planning_head.py 지나감")
+
     def __init__(self,
                  bev_h=200,
                  bev_w=200,

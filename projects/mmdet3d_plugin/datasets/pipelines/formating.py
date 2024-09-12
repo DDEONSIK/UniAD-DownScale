@@ -11,6 +11,8 @@ from mmdet3d.datasets.pipelines import DefaultFormatBundle3D
 
 @PIPELINES.register_module()
 class CustomDefaultFormatBundle3D(DefaultFormatBundle3D):
+    print("추적 UniAD/projects/mmdet3d_plugin/datasets/pipelines/formating.py 지나감")
+
     """Default formatting bundle.
     It simplifies the pipeline of formatting common fields for voxels,
     including "proposals", "gt_bboxes", "gt_labels", "gt_masks" and

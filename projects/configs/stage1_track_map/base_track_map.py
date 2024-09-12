@@ -1,3 +1,8 @@
+
+print("추적 UniAD/projects/configs/stage1_track_map/base_track_map.py 지나감")
+
+
+
 _base_ = ["../_base_/datasets/nus-3d.py",
           "../_base_/default_runtime.py"]
 
@@ -625,8 +630,8 @@ lr_config = dict(
     warmup_ratio=1.0 / 3,
     min_lr_ratio=1e-3,
 )
-total_epochs = 6 #_ 초기값:6 학습 에포크 수
-evaluation = dict(interval=6, pipeline=test_pipeline)
+total_epochs = 2 #_ 초기값:6 학습 에포크 수
+evaluation = dict(interval=1, pipeline=test_pipeline) # interval=6 마다 검증
 runner = dict(type="EpochBasedRunner", max_epochs=total_epochs)
 log_config = dict(
     interval=10, hooks=[dict(type="TextLoggerHook"), dict(type="TensorboardLoggerHook")]
