@@ -1,5 +1,5 @@
 <div align="center">
-<h2>UniAD - DownScale</h2>
+<h2>UniAD Model Lightweighting and Performance Comparison</h2>
 </div>
 
 - [2024/10]: Manuscript submitted (received on October 31, 2024).
