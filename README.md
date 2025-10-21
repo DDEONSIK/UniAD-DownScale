@@ -15,8 +15,8 @@ Recently developed autonomous driving systems based on deep learning typically o
 ---
 
 ## Keywords
-
 deep learning, autonomous driving, multimodal, lightweighting
+
 ---
 ### Table 1. Comparison of structures by lightweight version
 *The two values in the table represent the structures in stages 1 and 2, respectively.*
