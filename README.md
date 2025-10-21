@@ -1,10 +1,10 @@
 
 <h2>UniAD - DownScale</h2>
 
-- [2024/10/30]: First implementation completed.
-- [2024/10/31]: Manuscript submitted.
-- [2024/12/21]: Manuscript revised.
-- [2025/02/15]: This work has been accepted for publication in the Institute of Control, Robotics and Systems (ICROS), 2025.
+- [2024/10]: First implementation completed.
+- [2024/12]: Manuscript submitted.
+- [2024/02]: Manuscript revised.
+- [2025/04]: This work has been accepted for publication in the Institute of Control, Robotics and Systems (ICROS), 2025.
 
 
 ## Abstract
@@ -17,7 +17,7 @@ Recently developed autonomous driving systems based on deep learning typically o
 
 deep learning, autonomous driving, multimodal, lightweighting
 
-
+---
 
 <div align="center">   
   
