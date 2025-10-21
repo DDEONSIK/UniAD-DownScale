@@ -7,6 +7,18 @@
 - [2025/02/15]: This work has been accepted for publication in the Institute of Control, Robotics and Systems (ICROS), 2025.
 
 
+## Abstract
+
+Recently developed autonomous driving systems based on deep learning typically operate through modular architectures, where separate modules perform distinct individual tasks. While the UniAD framework proposed in the “Planning-oriented Autonomous Driving” paper addresses the limitations of modular approaches through a unified architecture, its complex transformer structure requires substantial computational resources to function. This paper proposes a lightweight version of UniAD to improve the accessibility of multimodal learning. We reduce the computational complexity by lowering the number of transformer layers and queries, the dimensions, and the BEV spatial resolution. Additionally, we optimize memory usage by limiting sampling queries and enabling page-locked memory settings. Experiments with two versions of the lightweight architecture show significant memory reductions: up to 79.92% in Stage 1 and 38.81% in Stage 2 compared with the original UniAD architecture (52.3 GB and 16.67 GB, respectively). Although the lightweight model suffers an overall performance degradation, we discover that progressive resolution expansion during training can enhance its feature extraction capability, particularly in the initial low-resolution learning phase.
+
+---
+
+## Keywords
+
+deep learning, autonomous driving, multimodal, lightweighting
+
+
+
 <div align="center">   
   
 # Planning-oriented Autonomous Driving
