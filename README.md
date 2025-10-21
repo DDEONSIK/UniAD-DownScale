@@ -1,6 +1,7 @@
-
+<div align="center">
 <h2>UniAD - DownScale</h2>
-
+</div>
+---
 - [2024/10]: First implementation completed.
 - [2024/12]: Manuscript submitted.
 - [2024/02]: Manuscript revised.
