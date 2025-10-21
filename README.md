@@ -17,6 +17,25 @@ Recently developed autonomous driving systems based on deep learning typically o
 ## Keywords
 
 deep learning, autonomous driving, multimodal, lightweighting
+---
+### Table 1. Comparison of structures by lightweight version
+*The two values in the table represent the structures in stages 1 and 2, respectively.*
+| Method | GPU*N (NVIDIA) | Encoder | embed dimensions | layers | heads | FFN channels | BEV resolution | Queue length (stage-1) | BEV queries | Seg queries | Learning Rate | Grid Size | Query dimensions (stage-2) | Pin memory | Memory threshold |
+|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+| UniAD[3] | A100*16 | R101 | 256 | 6 | 8 | 2048 | 200x200 | 5 | 900 | 300 | 2e-4 | 512 | 256 | False | 3 |
+| DV-1 | 3090*3 | R101 | 128 | 4 | 8 | 1024 | 200x200 | 3 | 900 | 300 | 1e-6<br>1e-4 | 512<br>256 | 128 | False | 3 |
+| DV-2 | A100*1 | R50 | 128 | 4 | 4 | 1024 | 50x50<br>200x200 | 3 | 900 | 300 | 2e-4 | 512 | 128 | True | 1 |
+
+---
+
+### Table 2. Comparison of experimental results by lightweight version
+*The two values in the Memory section represent stages 1 and 2, respectively.*
+| Method | Memory (GB) | AMOTA ↑ [%] | AMOTP ↓ [m] | mIDS ↓ [count] | IoU-lane ↑ [%] | IoU-road ↑ [%] | minADE ↓ [m] | minFDE ↓ [m] | MR ↓ [%] | EPA ↓ [%] | IoU-o. ↑ [%] | IoU-f. ↑ [%] | VPQ-n. ↑ [%] | VPQ-f. ↑ [%] | avgL2 ↓ [m] | avgCol. ↓ [%] |
+|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+| UniAD (Base) | 52.3<br>16.67 | **0.359** | **1.32** | 906 | 0.313 | **0.691** | **0.708** | **1.025** | 0.151 | **0.456** | **63.4** | **40.2** | **54.7** | **33.5** | 1.03 | **0.31** |
+| UniAD (Small) | 파일, 미공개<br>테스트 불가 | 0.241 | 1.488 | 958 | **0.315** | 0.689 | 0.788 | 1.126 | 0.156 | 0.381 | 59.4 | 35.6 | 49.2 | 28.9 | 1.04 | 0.32 |
+| DV-1 | 17.9<br>10.4 | 0.000 | 1.946 | 1493 | 0.253 | 0.615 | **0.995** | **1.274** | **0.130** | -0.077 | 25.7 | 9.8 | 15.4 | 5.7 | 1.25 | 0.88 |
+| DV-2 | 10.5<br>10.2 | **0.016** | **1.816** | **753** | **0.304** | **0.684** | 1.157 | 1.658 | 0.208 | 0.108 | **43.0** | **22.0** | **29.6** | **15.0** | **0.97** | **0.75** |
 
 ---
 ---
