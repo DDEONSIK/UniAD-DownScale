@@ -2,10 +2,10 @@
 <h2>UniAD Model Lightweighting and Performance Comparison</h2>
 </div>
 
-- [2024/10]: Manuscript submitted (received on October 31, 2024).
-- [2024/12]: Manuscript revised (on December 21, 2024).
-- [2025/02]: Manuscript accepted (on February 15, 2025).
-- [2025/04]: This work has been published in the Institute of Control, Robotics and Systems (ICROS, SCOPUS)
+- [2024/10]: Manuscript submitted.
+- [2024/12]: Manuscript revised.
+- [2025/02]: Manuscript accepted.
+- [2025/04]: This work has been published in the Institute of Control, Robotics and Systems (ICROS, SCOPUS).
 
 <p align="center">
     <a href='https://doi.org/10.5302/J.ICROS.2025.24.0249'><img src="https://img.shields.io/badge/Paper-PDF-blue?style=flat&#x26;logo=doi&#x26;logoColor=yello" alt="Paper PDF"></a>
